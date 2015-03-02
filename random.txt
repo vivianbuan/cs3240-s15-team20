@@ -1,1 +1,1 @@
-This is a random text file. 
+This is a text on the merging and conflict.
