@@ -1,4 +1,1 @@
-<<<<<<< HEAD
-=======
 This is a test on conflict. //edited by vivian
->>>>>>> 4d347a2a0a5c7e87c4d9cf299799dd8983af9321
