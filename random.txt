@@ -1,9 +1,5 @@
 This is a test on conflict. //edited by vivian
-This is another line.
+This is another line filled with useless text.
 AND THIS IS ANOTHER USELESS LINE!
 Random line
-Why
-do not ask
-Why can't I ask?
-because I said so
-awww that's sad
+
