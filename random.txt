@@ -1,1 +1,2 @@
-This is a text on the merging and conflict.
+This is a test on conflict. //edited by vivian
+
