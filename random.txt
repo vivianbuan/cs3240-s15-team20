@@ -1,3 +1,5 @@
 This is a test on conflict. //edited by vivian
 This is another line.
 AND THIS IS ANOTHER USELESS LINE!
+whoa whoa
+CONFLICT!
