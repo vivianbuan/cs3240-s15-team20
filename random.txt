@@ -1,1 +1,1 @@
-This is a test on the merging and conflict.
+This is a random text file. 
