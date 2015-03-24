@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Logged Out | SecureWitness{% endblock %}
+
+{% block branding %}
+<strong>SecureWitness</strong>
+{% endblock %}
+
+{% block content_title %}
+  <h2>Logged Out</h2>
+  <hr>
+{% endblock %}
+
+{% block content %}
+<p>{% trans "See you next time!" %}</p>
+<p><a href="{% url 'login' %}">{% trans 'Log in again' %}</a></p>
+{% endblock %}
