@@ -1,20 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title> Report </title>
-</head>
+{% extends "base.html" %}
 
-<body>
+{% block title %}Home | SecureWitness{% endblock %}
 
-<div class="container">
-    <h1> User Report </h1>
-    {% for r in report %}
-    <h2> {{ r.title }} </h2>
-    <h3> Posted on {{ r.timestamp }} by {{ r.author}}</h3>
-    <p> {{  r.bodytext  }} </p>
-    {%  endfor %}
+{% block branding %}
+<strong>SecureWitness</strong>
+{% endblock %}
+
+{% block content_title %}
+  <h2>User Reports</h2>
+  <hr>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="list-group">
+	{% for r in report %}
+		<a href="{% url 'reports:detail' r.pk%}" class="list-group-item">
+			<h3> {{ r.title }} </h3>
+			<h4> Posted on {{ r.timestamp }} by {{ r.author}}</h4>
+			<h5> {{  r.bodytext  }} </h5>
+		</a>
+	{%  endfor %}
 </div>
 
-</body>
-</html>
+{% endblock %}

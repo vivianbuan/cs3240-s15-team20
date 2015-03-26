@@ -9,4 +9,5 @@ def home(request):
     return render_to_response('index.html', {'report': entries})
 
 
-
+def detail(request, pk):
+	return render_to_response('detail.html', {'report': reports.objects.all().filter(pk=pk)[0]})
