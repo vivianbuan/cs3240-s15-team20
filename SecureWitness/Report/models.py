@@ -7,3 +7,6 @@ class reports(models.Model):
     bodytext = models.TextField()
     timestamp = models.DateTimeField()
 
+    def __str__(self) :
+    	return self.title
+
