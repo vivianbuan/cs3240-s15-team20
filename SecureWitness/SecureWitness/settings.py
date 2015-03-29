@@ -61,7 +61,7 @@ WSGI_APPLICATION = 'SecureWitness.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'myDataBase',
+        'NAME': 'myDataBase.db',
     }
 }
 
