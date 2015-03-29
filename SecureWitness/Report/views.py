@@ -10,3 +10,6 @@ def home(request):
 
 def detail(request, pk):
 	return render(request, 'detail.html', {'report': reports.objects.all().filter(pk=pk)[0]})
+
+def add_report(request):
+    return render(request, 'add_report.html')

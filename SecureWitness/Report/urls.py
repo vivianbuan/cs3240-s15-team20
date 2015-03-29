@@ -4,4 +4,5 @@ from django.contrib import admin, auth
 urlpatterns = patterns('',
     url(r'^$', 'Report.views.home', name='home'),
     url(r'^detail/(\d+)/$', 'Report.views.detail', name='detail'),
+    url(r'^add_report/$', 'Report.views.add_report', name='add_report'),
     )

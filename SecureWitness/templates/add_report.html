@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{%  block title %}
+Add Report | SecureWitness
+{% endblock %}
+
+{% block content_title %}
+  <h2>Report</h2>
+  <hr>
+{% endblock %}
+
+{% block content %}
+<form role="form">
+  <div class="form-group">
+    <label for="name">Text Area</label>
+    <textarea class="form-control" rows="100"></textarea>
+  </div>
+<div class="form-actions">
+    <button type="submit" class="btn btn-primary"> Post </button>
+</div>
+
+</form>
+{% endblock %}
