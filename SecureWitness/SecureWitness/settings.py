@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'Report',
     'accounts',
+    'fileUpload',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -54,6 +55,9 @@ ROOT_URLCONF = 'SecureWitness.urls'
 
 WSGI_APPLICATION = 'SecureWitness.wsgi.application'
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+MEDIA_URL = '/media/'
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
@@ -81,6 +85,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
+
+STATICFILES_DIRS = (
+	os.path.join(BASE_DIR, 'static/'),
+)
 
 STATIC_URL = '/static/'
 
