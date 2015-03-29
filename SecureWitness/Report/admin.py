@@ -1,5 +1,6 @@
 from django.contrib import admin
 from Report.models import reports
+from Report.models import Folder
 
 
 #class ReportAdmin(admin.ModelAdmin):
@@ -8,3 +9,4 @@ from Report.models import reports
 
 
 admin.site.register(reports)
+admin.site.register(Folder)
