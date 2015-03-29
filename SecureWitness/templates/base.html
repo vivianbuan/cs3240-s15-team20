@@ -51,6 +51,8 @@
                     {% endblock %}
                 {% else %}
                     <a href="{% url 'accounts:login' %}?next={{request.path}}">{% trans 'Log in' %}</a>
+                    |
+                    <a href="{% url 'accounts:register' %}?next={{request.path}}">{% trans 'Register' %}</a>
                 {% endif %}
             </p>
         </div>
