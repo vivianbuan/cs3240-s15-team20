@@ -11,13 +11,20 @@ Add Report | SecureWitness
 
 {% block content %}
 <form role="form">
-  <div class="form-group">
-    <label for="name">Text Area</label>
-    <textarea class="form-control" rows="100"></textarea>
-  </div>
-<div class="form-actions">
-    <button type="submit" class="btn btn-primary"> Post </button>
-</div>
-
+	<div class="form-group">
+		<label for="name">Short Description</label>
+		<input type="text" class="form-control" placeholder="Title" name="title"></input>
+	</div>
+	<div class="form-group">
+		<label for="name">Long Description</label>
+		<textarea class="form-control" rows="10" placeholder="Body" name="body"></textarea>
+	</div>
+	<div class="form-group">
+		<label for="name">Attachment</label>
+		<input type="file" class="form-control" name="files[]" multiple="true"></input>
+	</div>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-primary"> Post </button>
+	</div>
 </form>
 {% endblock %}
