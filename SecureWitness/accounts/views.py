@@ -3,7 +3,7 @@ from django.shortcuts import render, HttpResponseRedirect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from accounts.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
 
 # Create your views here.
