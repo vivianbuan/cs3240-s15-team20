@@ -8,4 +8,5 @@ urlpatterns = patterns('',
     url(r'^logout/$', 'django.contrib.auth.views.logout', name='logout'),
     url(r'^changepw/$', 'django.contrib.auth.views.password_change', name='password_change'),
     url(r'^register/$', views.register, name='register'),
+    url(r'^profile/$', views.profile, name='profile'),
 )

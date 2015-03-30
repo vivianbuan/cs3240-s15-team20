@@ -5,7 +5,6 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
-
 # Create your views here.
 
 @sensitive_post_parameters()
@@ -31,3 +30,6 @@ def register(request, creation_form=UserCreationForm,extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
     return render(request, "registration/register.html", context)
+
+def profile(request):
+    return render(request, 'index.html')
