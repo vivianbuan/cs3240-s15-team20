@@ -19,7 +19,6 @@
 		<a href="{% url 'reports:detail' r.pk%}" class="list-group-item">
 			<h3> {{ r.title }} </h3>
 			<h4> Posted on {{ r.timestamp }} by {{ r.author}}</h4>
-			<h5> {{  r.bodytext  }} </h5>
 		</a>
 	{%  endfor %}
 </div>
