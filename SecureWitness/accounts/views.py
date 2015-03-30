@@ -34,3 +34,6 @@ def register(request, creation_form=UserCreationForm,extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
     return render(request, "registration/register.html", context)
+
+def profile(request):
+    return render(request, 'index.html')

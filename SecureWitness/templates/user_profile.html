@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Home | SecureWitness{% endblock %}
+
+{% block branding %}
+<strong>SecureWitness</strong>
+{% endblock %}
+
+{% block content_title %}
+  <h2>User Reports</h2>
+  <h3 align="left"> <a href="{% url 'reports:add_report' %}" class = "btn btn-primary"> Add Report</a></h3>
+  <hr>
+{% endblock %}
+
+
+{% block content %}
+    <h2> We ar in the profile page</h2>
+{% endblock %}
