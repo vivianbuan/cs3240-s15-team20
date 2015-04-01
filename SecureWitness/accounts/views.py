@@ -5,6 +5,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
+from accounts.models import UserProfile
 
 # Create your views here.
 
@@ -17,7 +18,9 @@ def register(request, creation_form=UserCreationForm,extra_context=None):
         # Add User Model instance here
         form = creation_form(data=request.POST)
         if form.is_valid() :
-            form.save()
+            user = form.save()
+            profile = UserProfile(user = user)
+            profile.save()
             user = authenticate(username=form.cleaned_data.get("username"),
                          password=form.cleaned_data.get("password1"))
             login(request,user)
@@ -31,3 +34,6 @@ def register(request, creation_form=UserCreationForm,extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
     return render(request, "registration/register.html", context)
+
+def profile(request):
+    return render(request, 'index.html')

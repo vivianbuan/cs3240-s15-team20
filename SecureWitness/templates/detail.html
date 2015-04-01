@@ -1,16 +1,9 @@
 {% extends "base.html" %}
 
 {% block title %}Home | SecureWitness{% endblock %}
-
-{% block branding %}
-<strong>SecureWitness</strong>
-{% endblock %}
-
 {% block content_title %}
   <h2>{{report.title}}</h2>
-  <hr>
 {% endblock %}
-
 
 {% block content %}
 	<h5>Posted on {{ report.timestamp }} by {{ report.author}}</h5>

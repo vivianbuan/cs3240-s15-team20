@@ -2,19 +2,17 @@
 
 {% block title %}Home | SecureWitness{% endblock %}
 
+{% block branding %}
+<strong>SecureWitness</strong>
+{% endblock %}
+
 {% block content_title %}
   <h2>User Reports</h2>
   <h3 align="left"> <a href="{% url 'reports:add_report' %}" class = "btn btn-primary"> Add Report</a></h3>
+  <hr>
 {% endblock %}
 
 
 {% block content %}
-<div class="list-group">
-	{% for r in report %}
-		<a href="{% url 'reports:detail' r.pk%}" class="list-group-item">
-			<h3> {{ r.title }} </h3>
-			<h4> Posted on {{ r.timestamp }} by {{ r.author}}</h4>
-		</a>
-	{%  endfor %}
-</div>
+    <h2> We ar in the profile page</h2>
 {% endblock %}

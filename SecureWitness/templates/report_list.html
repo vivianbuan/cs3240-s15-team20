@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Home | SecureWitness{% endblock %}
+
+{% block file_in_folder %}
+  <h1>{{Folder.file_name}}</h1>
+    <ul>
+    {%  for reports in folder.reports_set.all %}
+        <li>{{ reports.title }}</li>
+    {%  endfor %}
+    </ul>
+{% endblock %}
