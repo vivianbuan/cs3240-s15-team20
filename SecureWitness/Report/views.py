@@ -34,7 +34,8 @@ def add_report(request):
 
 	return render(request,'add_report.html', {'report': entries})
 
-#def show_in_folder(request):
+def show_in_folder(request):
 #    reports_list = reports.objects.order_by('-timestamp')[:5]
 #    context = {'reports_list': reports_list}
 #    return render(request, 'report_list.html', context)
+	pass
