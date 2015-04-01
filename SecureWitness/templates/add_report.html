@@ -10,7 +10,8 @@ Add Report | SecureWitness
 {% endblock %}
 
 {% block content %}
-<form role="form">
+<form action="{% url 'reports:add_report' %}" method="post" enctype="multipart/form-data" role="form"> 
+	{% csrf_token %}
 	<div class="form-group">
 		<label for="name">Short Description</label>
 		<input type="text" class="form-control" placeholder="Title" name="title"></input>
