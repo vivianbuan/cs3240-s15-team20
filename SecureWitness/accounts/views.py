@@ -5,7 +5,10 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
+
+from django.db.models import Q
 from accounts.models import UserProfile
+from Report.models import reports
 
 # Create your views here.
 
@@ -36,4 +39,5 @@ def register(request, creation_form=UserCreationForm,extra_context=None):
     return render(request, "registration/register.html", context)
 
 def profile(request):
-    return render(request, 'index.html')
+    entries = reports.objects.filter(Q(author=request.user.username))
+    return render(request, 'user_profile.html', {'report':entries})
