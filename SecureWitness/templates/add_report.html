@@ -12,16 +12,40 @@ Add Report | SecureWitness
 <form action="{% url 'reports:add_report' %}" method="post" enctype="multipart/form-data" role="form"> 
 	{% csrf_token %}
 	<div class="form-group">
-		<label for="name">Short Description</label>
+		<label for="name">Author</label>
+		<input type="text" class="form-control" placeholder="Author" name="author"></input>
+	</div>
+	<div class="form-group">
+		<label for="name">Title</label>
 		<input type="text" class="form-control" placeholder="Title" name="title"></input>
 	</div>
 	<div class="form-group">
+		<label for="name">Short Description</label>
+		<input type="text" class="form-control" placeholder="Short Description" name="short"></input>
+	</div>
+	<div class="form-group">
 		<label for="name">Long Description</label>
-		<textarea class="form-control" rows="10" placeholder="Body" name="body"></textarea>
+		<textarea class="form-control" rows="10" placeholder="Long Description" name="details"></textarea>
+	</div>
+	<div class="form-group">
+		<label for="name">Location</abel>
+		<input type="text" class="form-control" placeholder="(optional)" name="location"></input>
+	</div>
+	<div class="form-group">
+		<label for="name">Date</label> 
+		<input type="date" class="form-control" name="date"></input>
+	</div>
+	<div class="form-group">
+		<label for="name">Keywords</label>
+		<input type="text" class="form-control" placeholder="(optional" name="keywords"></input>
 	</div>
 	<div class="form-group">
 		<label for="name">Attachment</label>
 		<input type="file" class="form-control" name="files[]" multiple="true"></input>
+	</div>
+	<div class="form-group">
+		<label for="name">Private/Public</label> <br/>
+		<input type="checkbox" name="private" value="Private"></input>
 	</div>
 	<div class="form-actions">
 		<button type="submit" class="btn btn-primary"> Post </button>
