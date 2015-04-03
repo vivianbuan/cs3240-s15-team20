@@ -9,7 +9,16 @@
 	<h5>Posted on {{ report.timestamp }} by {{ report.author}}</h5>
 	<div class="panel panel-default">
 		<div class=panel-body>
-			{{  report.bodytext  }}
+			Author: {{  report.author  }} <br />
+			Short Description: {{ report.short }} <br/>
+			Long Description: <br /> 
+			<p> 
+				{{ report.details }}
+			</p>
+			Location: {{ report.location }} <br/>
+			Date: {{ report.date }} <br/>
+			Keywords: {{ report.keywords }} <br/>
+			Private: {{ report.private }} <br />
 		</div>
 	</div>
 
