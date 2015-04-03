@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
 from accounts.models import UserProfile
-
+from Report.models import Folder
 # Create your views here.
 
 @sensitive_post_parameters()
@@ -35,5 +35,12 @@ def register(request, creation_form=UserCreationForm,extra_context=None):
         context.update(extra_context)
     return render(request, "registration/register.html", context)
 
+
 def profile(request):
-    return render(request, 'index.html')
+    folders = Folder.objects.all()[:20]
+    return render(request, 'user_profile.html', {'folder': folders})
+
+
+def report_list(request, folder_id):
+    return render(request, 'report_list.html', {'folder': Folder.objects.all().filter(pk=folder_id)[0]})
+

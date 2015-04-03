@@ -2,11 +2,19 @@
 
 {% block title %}Home | SecureWitness{% endblock %}
 
-{% block file_in_folder %}
-  <h1>{{Folder.file_name}}</h1>
-    <ul>
-    {%  for reports in folder.reports_set.all %}
-        <li>{{ reports.title }}</li>
-    {%  endfor %}
-    </ul>
+{% block content_title %}
+  <h2>{{ folder.file_name }}</h2>
+  <h3 align="left"> <a href="{% url 'reports:add_report' %}" class = "btn btn-primary"> Add Report</a></h3>
 {% endblock %}
+
+{% block content %}
+<div class="list-group">
+	{% for r in folder.reports_set.all %}
+		<a href="{% url 'reports:detail' r.pk%}" class="list-group-item">
+			<h3> {{ r.title }} </h3>
+			<h4> Posted on {{ r.timestamp }} by {{ r.author}}</h4>
+		</a>
+	{%  endfor %}
+</div>
+{% endblock %}
+
