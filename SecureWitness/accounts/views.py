@@ -5,8 +5,12 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
+
+from django.db.models import Q
 from accounts.models import UserProfile
 from Report.models import Folder
+from Report.models import reports
+
 # Create your views here.
 
 @sensitive_post_parameters()
