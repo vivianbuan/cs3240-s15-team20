@@ -12,12 +12,7 @@ Add Report | SecureWitness
 <form action="{% url 'reports:add_report' %}" method="post" enctype="multipart/form-data" role="form"> 
 	{% csrf_token %}
 	<div class="form-group">
-		<label for="name">Author</label>
-		<input type="text" class="form-control" placeholder="Author" name="author"></input>
-	</div>
-	<div class="form-group">
-		<label for="name">Title</label>
-		<input type="text" class="form-control" placeholder="Title" name="title"></input>
+		<input type="hidden" class="form-control" placeholder="Author" name="author" value="{{ user.username }}"></input>
 	</div>
 	<div class="form-group">
 		<label for="name">Short Description</label>
