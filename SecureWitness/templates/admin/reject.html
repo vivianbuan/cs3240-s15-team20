@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Admin | SecureWitness{% endblock %}
+
+{% block content_title %}
+  <h2>Admin Main</h2>
+{% endblock %}
+
+{% block content %}
+<h3>
+<a href="{% url 'accounts:login' %}?next={% url 'accounts:admin_page' %}">
+	Please Login with an admin account
+</a>
+</h3>
+{% endblock %}
+

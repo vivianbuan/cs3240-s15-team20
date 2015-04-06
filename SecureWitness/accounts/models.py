@@ -10,10 +10,19 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.username
 
+    administrator = models.BooleanField(default=0)
+
+    @property    
+    def is_admin(self):
+        return bool(self.administrator)
+
+    @property    
+    def date_joined(self):
+        return self.user.date_joined
+
 
 class UserGroup(models.Model):
     group = models.OneToOneField(Group)
 
     def __str__(self):
         return self.group.name
-

@@ -7,7 +7,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
 
 from django.db.models import Q
-from accounts.models import UserProfile
+from accounts.models import UserProfile, UserGroup
 from Report.models import Folder
 from Report.models import reports
 
@@ -48,3 +48,30 @@ def profile(request):
 def report_list(request, folder_id):
     return render(request, 'report_list.html', {'folder': Folder.objects.all().filter(pk=folder_id)[0]})
 
+def admin_page(request):
+    profile = UserProfile.objects.filter(user = request.user)[0]
+    if not profile.is_admin :
+        return render(request, 'admin/reject.html')
+
+    Groups = UserGroup.objects.all()[:20]
+    Users = UserProfile.objects.all()[:20]
+
+    context = {'groups' : Groups, 'users' : Users}
+    return render(request, 'admin/main.html', context)
+
+def admin_user(request, user_id):
+    context = {'u' : UserProfile.objects.filter(pk=user_id)[0]}
+    return render(request, 'admin/user.html', context)
+
+def admin_group(request, group_id):
+    return render(request, 'admin/group.html')
+
+def admin_creategroup(request):
+    return render(request, 'admin/creategroup.html')
+
+def admin_deleteuser(request, user_id):
+    u = UserProfile.objects.filter(pk=user_id)[0]
+    u_u = u.user
+    u.delete()
+    u_u.delete()
+    return render(request, 'admin/action_complete.html')

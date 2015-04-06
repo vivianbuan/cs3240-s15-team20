@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Admin | SecureWitness{% endblock %}
+
+{% block content_title %}
+  <h2>Admin Main</h2>
+{% endblock %}
+
+{% block content %}
+<h3> {{ u }} </h3>
+<h4> Joined {{ u.date_joined}} </h4>
+<a href="{% url 'accounts:admin_deleteuser' u.pk %}" class="btn btn-primary">
+	Delete
+</a>
+{% endblock %}
+
