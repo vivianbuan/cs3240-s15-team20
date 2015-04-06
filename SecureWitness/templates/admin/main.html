@@ -13,7 +13,10 @@
 			<h3> {{ group.group }} </h3>
 		</a>
 	{%  endfor %}
+	<hr />
 	<a href="{% url 'accounts:admin_creategroup' %}" class="btn btn-primary">Create Group</a>
+	<hr />
+	<hr />
 
 	{% for user in users %}
 		<a href="{% url 'accounts:admin_user' user.pk %}" class="list-group-item">

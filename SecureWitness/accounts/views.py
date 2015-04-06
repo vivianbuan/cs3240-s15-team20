@@ -10,6 +10,7 @@ from django.db.models import Q
 from accounts.models import UserProfile, UserGroup
 from Report.models import Folder
 from Report.models import reports
+from accounts.forms import GroupCreationForm
 
 # Create your views here.
 
@@ -66,8 +67,22 @@ def admin_user(request, user_id):
 def admin_group(request, group_id):
     return render(request, 'admin/group.html')
 
-def admin_creategroup(request):
-    return render(request, 'admin/creategroup.html')
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def admin_creategroup(request, creation_form=GroupCreationForm):
+    if request.method == "POST":
+        form = creation_form(data=request.POST)
+        if form.is_valid() :
+            form.save()
+            return HttpResponseRedirect("/accounts/admin")
+    else :
+        form = creation_form(request)
+
+    context = {
+        'form': form,
+    }
+    return render(request, "admin/creategroup.html", context)
 
 def admin_deleteuser(request, user_id):
     u = UserProfile.objects.filter(pk=user_id)[0]
