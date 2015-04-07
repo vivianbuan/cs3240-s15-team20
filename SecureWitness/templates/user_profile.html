@@ -3,7 +3,7 @@
 {% block title %}Home | SecureWitness{% endblock %}
 
 {% block content_title %}
-  <h2>User Profile</h2>
+  <h2>User Profile (<a href="{% url 'accounts:admin_page' %}">Administrator</a>)</h2>
   <h3 align="left"> <a href="{% url 'reports:add_report' %}" class = "btn btn-primary"> Add Report</a></h3>
 {% endblock %}
 

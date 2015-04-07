@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     url(r'^admin/$', views.admin_page, name='admin_page'),
     url(r'^admin/user/(\d+)/$', views.admin_user, name='admin_user'),
     url(r'^admin/delete/user/(\d+)/$', views.admin_deleteuser, name='admin_deleteuser'),
+    url(r'^admin/modify/user/(\d+)/$', views.admin_makeadmin, name='admin_makeadmin'),
     url(r'^admin/group/(\d+)/$', views.admin_group, name='admin_group'),
     url(r'^admin/group/$', views.admin_creategroup, name='admin_creategroup'),
 )

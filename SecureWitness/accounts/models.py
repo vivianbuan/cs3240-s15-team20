@@ -16,6 +16,9 @@ class UserProfile(models.Model):
     def is_admin(self):
         return bool(self.administrator)
 
+    def make_admin(self,admin):
+        self.administrator = admin
+
     @property    
     def date_joined(self):
         return self.user.date_joined
