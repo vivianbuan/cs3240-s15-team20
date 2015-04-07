@@ -10,7 +10,8 @@ from django.db.models import Q
 from accounts.models import UserProfile, UserGroup
 from Report.models import Folder
 from Report.models import reports
-from accounts.forms import GroupCreationForm
+from accounts.forms import GroupCreationForm, UserGroupCreationForm
+
 
 # Create your views here.
 
@@ -125,3 +126,16 @@ def check_user_fail(request):
         return True
     if not profile.is_admin :
         return True
+
+def add_group(request, creation_form=UserGroupCreationForm):
+    if request.method == "POST":
+        form = creation_form(data=request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/')
+    else:
+        form=creation_form(request)
+    context = {
+        'form' : form,
+    }
+    return render(request, "add_group.html")
