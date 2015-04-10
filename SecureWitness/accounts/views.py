@@ -11,6 +11,7 @@ from accounts.models import UserProfile, UserGroup
 from Report.models import Folder
 from Report.models import reports
 from accounts.forms import GroupCreationForm, UserGroupCreationForm
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
@@ -127,6 +128,7 @@ def check_user_fail(request):
     if not profile.is_admin :
         return True
 
+@login_required(login_url="/accounts/login/")
 def add_group(request, creation_form=UserGroupCreationForm):
     if request.method == "POST":
         form = creation_form(data=request.POST)

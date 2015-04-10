@@ -23,13 +23,8 @@ def detail(request, pk):
 	return render(request, 'detail.html', {'report': rep, 'documents': doc})
 
 
-
 def add_report(request):
 	if request.method == 'POST':
-		# Handle files
-		
-
-		# Create and save report 
 		auth = request.POST.get("author")
 		sh = request.POST.get("short")
 		det = request.POST.get("details")
@@ -54,3 +49,8 @@ def add_report(request):
 	entries = reports.objects.all()[:20]
 
 	return render(request,'add_report.html', {'report': entries})
+
+
+
+
+
