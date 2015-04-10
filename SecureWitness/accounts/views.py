@@ -45,7 +45,10 @@ def register(request, creation_form=UserCreationForm,extra_context=None):
 
 def profile(request):
     folders = Folder.objects.all()[:20]
-
+    if len(folders) == 0:
+        folder = Folder()
+        folder.save()
+        folders = Folder.objects.all()[:20]
     # This code allows for an admin link on the user profile page.
     if request.user.is_active:
         profile = UserProfile.objects.filter(user = request.user)[0]
