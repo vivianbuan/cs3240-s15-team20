@@ -10,6 +10,7 @@ from django.db.models import Q
 from accounts.models import UserProfile
 from Report.models import Folder
 from Report.models import reports
+from Report.forms import AddFolderForm
 
 # Create your views here.
 
@@ -41,10 +42,35 @@ def register(request, creation_form=UserCreationForm,extra_context=None):
 
 
 def profile(request):
-    folders = Folder.objects.all()[:20]
-    return render(request, 'user_profile.html', {'folder': folders})
+    # create a default folder if there is no folder exists
+    if len(Folder.objects.all()) == 0:
+        default_folder = Folder()
+        default_folder.save()
+    return render(request, 'user_profile.html', {'root': Folder.objects.filter(file_name="DEFAULT FOLDER")})
 
 
 def report_list(request, folder_id):
     return render(request, 'report_list.html', {'folder': Folder.objects.all().filter(pk=folder_id)[0]})
+
+
+def add_folder(request):
+    if request.method == 'POST':
+        title = request.POST.get("file_name")
+        parent_name = request.POST.get("parent_folder")
+        parent = Folder.objects.get(file_name=parent_name)
+        folder = Folder(file_name=title, parent_folder=parent)
+        folder.save()
+    folders = Folder.objects.all()[:20]
+    return render(request, 'add_folder.html', {'folder': folders})
+
+# def add_folder(request):
+#     if request.method == 'POST':
+#         form = AddFolderForm(request.POST)
+#         if form.is_valid():
+#             return HttpResponseRedirect('/thanks/')
+#     else:
+#         form = AddFolderForm()
+#     options = Folder.objects.all()
+#     return render(request, 'add_folder.html', {'form': form, 'options': options})
+
 

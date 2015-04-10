@@ -10,4 +10,5 @@ urlpatterns = patterns('',
     url(r'^register/$', views.register, name='register'),
     url(r'^profile/$', views.profile, name='profile'),
     url(r'^profile/folder/(\d+)/$', views.report_list, name='report_list'),
+    url(r'^profile/add_folder$', views.add_folder, name='add_folder'),
 )

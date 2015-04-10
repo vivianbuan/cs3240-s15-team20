@@ -1,10 +1,43 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{%  block title %}
+Add Folder | SecureWitness
+{% endblock %}
+
+{% block content_title %}
+  <h2>New Folder</h2>
+{% endblock %}
+
+{% block content %}
+<form action="{% url 'accounts:add_folder' %}" method="post" enctype="multipart/form-data" role="form">
+	{% csrf_token %}
+	<div class="form-group">
+		<label for="name">File Name</label>
+		<input type="text" class="form-control" placeholder="File Name" name="file_name"></input>
+	</div>
+	<div class="form-group">
+        {{ form.AddFolderForm }}
+		<label for="name">Parent Folder</label>
+{#		<input type="text" class="form-control" placeholder="Parent Folder" name="parent_folder"></input>#}
+            <div class="btn-group">
+        <select class="form-control"  name="parent_folder">
+            {%for t in folder%}
+                <option value="{{t.file_name}}" name="parent_name">{{t.file_name}}</option>
+            {%endfor%}
+        </select>
+          </div>
+{#         <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown">#}
+{#           <span data-bind="label">Select One</span>&nbsp;<span class="caret"></span>#}
+{#         </button>#}
+{#         <ul class="dropdown-menu" role="menu">#}
+{#             {% for t in folder %}#}
+{#                 <li><a name="parent_name" href="#">{{ t.file_name }}</a></li>#}
+{#             {% endfor %}#}
+{#         </ul>#}
+      </div>
+	<div class="form-actions">
+{#        <a href="{% url 'accounts:profile' %}" class = "btn btn-primary" type="submit"> Add</a></h3>#}
+		<button href="{% url 'accounts:profile' %}" type="submit" class="btn btn-primary"> Add </button>
+	</div>
+</form>
+{% endblock %}

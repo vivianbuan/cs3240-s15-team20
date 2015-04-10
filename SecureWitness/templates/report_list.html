@@ -9,6 +9,11 @@
 
 {% block content %}
 <div class="list-group">
+    {% for f in folder.parents.all %}
+		<a href="{% url 'accounts:report_list' f.pk %}" class="list-group-item">
+			<h3> {{ f.file_name }} </h3>
+		</a>
+	    {%  endfor %}
 	{% for r in folder.reports_set.all %}
 		<a href="{% url 'reports:detail' r.pk%}" class="list-group-item">
 			<h3> {{ r.title }} </h3>
