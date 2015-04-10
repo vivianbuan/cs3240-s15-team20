@@ -2,14 +2,30 @@
 
 {% block title %}Home | SecureWitness{% endblock %}
 {% block content_title %}
-  <h2>{{report.title}}</h2>
+  <h2>{{report.short}}</h2>
+  <p> By: {{ report.author }}
 {% endblock %}
 
 {% block content %}
 	<h5>Posted on {{ report.timestamp }} by {{ report.author}}</h5>
 	<div class="panel panel-default">
 		<div class=panel-body>
-			{{  report.bodytext  }}
+			Long Description: <br /> 
+			<p> 
+				{{ report.details }}
+			</p>
+			Location: {{ report.location }} <br/>
+			Date: {{ report.date }} <br/>
+			Keywords: {{ report.keywords }} <br/>
+			Private: {{ report.private }} <br />
+			Attachments:
+			{% if documents %}
+			{% for document in documents %}
+				<a href="{{ document.docfile.url }}"> {{ document.docfile.name }} </a>
+			{% endfor %}
+			{% else %}
+				None
+			{% endif %}
 		</div>
 	</div>
 

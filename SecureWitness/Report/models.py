@@ -13,14 +13,12 @@ class Folder(models.Model):
 
 class reports(models.Model):
     author = models.CharField(max_length=30)
-    title = models.CharField(max_length=100)
     short = models.TextField(max_length=100)
     details = models.TextField()
     location = models.CharField(max_length=100, null=True)
     date = models.DateField(blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add = True)
     keywords = models.CharField(max_length=100, null=True)
-    file = models.FileField(upload_to='documents/%Y/%m/%d', null=True)
     private = models.BooleanField(default = False)
     folder = models.ForeignKey(Folder, default=1)
 
@@ -30,3 +28,4 @@ class reports(models.Model):
 
 class Document(models.Model):
 	docfile = models.FileField(upload_to='documents/%Y/%m/%d')
+	report = models.ForeignKey(reports, null=True)

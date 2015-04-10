@@ -7,10 +7,12 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
 
 from django.db.models import Q
-from accounts.models import UserProfile
+from accounts.models import UserProfile, UserGroup
 from Report.models import Folder
 from Report.models import reports
-from Report.forms import AddFolderForm
+from accounts.forms import GroupCreationForm, UserGroupCreationForm
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 
@@ -42,11 +44,15 @@ def register(request, creation_form=UserCreationForm,extra_context=None):
 
 
 def profile(request):
-    # create a default folder if there is no folder exists
-    if len(Folder.objects.all()) == 0:
-        default_folder = Folder()
-        default_folder.save()
-    return render(request, 'user_profile.html', {'root': Folder.objects.filter(file_name="DEFAULT FOLDER")})
+    folders = Folder.objects.all()[:20]
+
+    # This code allows for an admin link on the user profile page.
+    if request.user.is_active:
+        profile = UserProfile.objects.filter(user = request.user)[0]
+    else:
+        profile = None
+
+    return render(request, 'user_profile.html', {'folder': folders, 'prof': profile})
 
 
 def report_list(request, folder_id):
@@ -63,14 +69,87 @@ def add_folder(request):
     folders = Folder.objects.all()[:20]
     return render(request, 'add_folder.html', {'folder': folders})
 
-# def add_folder(request):
-#     if request.method == 'POST':
-#         form = AddFolderForm(request.POST)
-#         if form.is_valid():
-#             return HttpResponseRedirect('/thanks/')
-#     else:
-#         form = AddFolderForm()
-#     options = Folder.objects.all()
-#     return render(request, 'add_folder.html', {'form': form, 'options': options})
 
+def admin_page(request):
+    if check_user_fail(request):
+        return render(request, 'admin/reject.html')
 
+    Groups = UserGroup.objects.all()[:20]
+    Users = UserProfile.objects.all()[:20]
+
+    context = {'groups' : Groups, 'users' : Users}
+    return render(request, 'admin/main.html', context)
+
+def admin_user(request, user_id):
+    if check_user_fail(request):
+        return render(request, 'admin/reject.html')
+
+    context = {'u' : UserProfile.objects.filter(pk=user_id)[0]}
+    return render(request, 'admin/user.html', context)
+
+def admin_group(request, group_id):
+    if check_user_fail(request):
+        return render(request, 'admin/reject.html')
+
+    return render(request, 'admin/group.html')
+
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def admin_creategroup(request, creation_form=GroupCreationForm):
+    if check_user_fail(request):
+        return render(request, 'admin/reject.html')
+
+    if request.method == "POST":
+        form = creation_form(data=request.POST)
+        if form.is_valid() :
+            form.save()
+            return HttpResponseRedirect("/accounts/admin")
+    else :
+        form = creation_form(request)
+
+    context = {
+        'form': form,
+    }
+    return render(request, "admin/creategroup.html", context)
+
+def admin_deleteuser(request, user_id):
+    if check_user_fail(request):
+        return render(request, 'admin/reject.html')
+
+    u = UserProfile.objects.filter(pk=user_id)[0]
+    u_u = u.user
+    u.delete()
+    u_u.delete()
+    return render(request, 'admin/action_complete.html')
+
+def admin_makeadmin(request, user_id):
+    if check_user_fail(request):
+        return render(request, 'admin/reject.html')
+
+    u = UserProfile.objects.filter(pk=user_id)[0]
+    u.administrator = 1
+    u.save()
+    return render(request, 'admin/action_complete.html')
+
+def check_user_fail(request):
+    try:
+        profile = UserProfile.objects.filter(user = request.user)[0]
+    except IndexError:
+        return True
+    if not profile.is_admin :
+        return True
+
+@login_required(login_url="/accounts/login/")
+def add_group(request, creation_form=UserGroupCreationForm):
+    if request.method == "POST":
+        form = creation_form(data=request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/')
+    else:
+        form=creation_form(request)
+    context = {
+        'form' : form,
+    }
+    return render(request, "add_group.html")

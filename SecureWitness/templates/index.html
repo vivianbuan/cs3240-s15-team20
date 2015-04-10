@@ -3,6 +3,7 @@
 {% block title %}Home | SecureWitness{% endblock %}
 
 {% block content_title %}
+   <h3 align="right"> <a href="{% url 'accounts:add_group' %}" class = "btn btn-primary"> Add Group</a></h3>
   <h2>User Reports</h2>
   <h3 align="left"> <a href="{% url 'reports:add_report' %}" class = "btn btn-primary"> Add Report</a></h3>
 {% endblock %}
@@ -11,7 +12,7 @@
 <div class="list-group">
 	{% for r in report %}
 		<a href="{% url 'reports:detail' r.pk%}" class="list-group-item">
-			<h3> {{ r.title }} </h3>
+			<h3> {{ r.short }} </h3>
 			<h4> Posted on {{ r.timestamp }} by {{ r.author}}</h4>
 		</a>
 	{%  endfor %}
