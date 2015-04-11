@@ -48,14 +48,15 @@ def profile(request):
     if len(folders) == 0:
         folder = Folder()
         folder.save()
-        folders = Folder.objects.all()[:20]
+        # folders = Folder.objects.all()[:20]
     # This code allows for an admin link on the user profile page.
     if request.user.is_active:
         profile = UserProfile.objects.filter(user = request.user)[0]
     else:
         profile = None
 
-    return render(request, 'user_profile.html', {'folder': folders, 'prof': profile})
+    root_folder = Folder.objects.get(pk=1)
+    return render(request, 'user_profile.html', {'o': root_folder, 'prof': profile})
 
 
 def report_list(request, folder_id):
@@ -65,12 +66,34 @@ def report_list(request, folder_id):
 def add_folder(request):
     if request.method == 'POST':
         title = request.POST.get("file_name")
-        parent_name = request.POST.get("parent_folder")
-        parent = Folder.objects.get(file_name=parent_name)
-        folder = Folder(file_name=title, parent_folder=parent)
-        folder.save()
+
+        # handel invalid input
+        if len(title) == 0:
+            error = "Error: folder name needed!"
+            folders = Folder.objects.all()[:20]
+            return render(request, 'add_folder.html', {'folder': folders, 'message': error})
+        elif Folder.objects.filter(file_name=title).count() != 0:
+            error = "Error: folder already exist!"
+            folders = Folder.objects.all()[:20]
+            return render(request, 'add_folder.html', {'folder': folders, 'message': error})
+        else:
+            parent_name = request.POST.get("parent_folder")
+            parent = Folder.objects.get(file_name=parent_name)
+            folder = Folder(file_name=title, parent_folder=parent)
+            folder.save()
+
+        entries = Folder.objects.all()[:20]
+
+        if request.user.is_active:
+            profile = UserProfile.objects.filter(user = request.user)[0]
+        else:
+            profile = None
+
+        return render(request, 'user_profile.html', {'folder': entries, 'prof': profile})
+
     folders = Folder.objects.all()[:20]
-    return render(request, 'add_folder.html', {'folder': folders})
+    error = None
+    return render(request, 'add_folder.html', {'folder': folders, 'message': error})
 
 
 def admin_page(request):
