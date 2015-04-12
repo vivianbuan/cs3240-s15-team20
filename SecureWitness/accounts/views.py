@@ -131,25 +131,11 @@ def edit_folder(request, folder_id):
             else:
                 profile = None
             return render(request, 'user_profile.html', {'o': root_folder, 'prof': profile})
-
-            # child_reports = current_folder.reports_set.all()
-            # child_folder = current_folder.parents.all()
-            # child_reports.delete()
-            # while child_folder.count() != 0:
-            #     to_be_deleted = child_folder
-            #     child_folder = []
-            #     for f in to_be_deleted:
-            #         child_folder.append(to_be_deleted.)
-
-
         else:                               # only for debug issue
             error = "Error: button not working!"
             current_folder = Folder.objects.filter(pk=folder_id)[0]
             folders = Folder.objects.all()[:20]
             return render(request, 'edit_folder.html', {'current': current_folder, 'folder': folders, 'message': error})
-
-
-
 
     current_folder = Folder.objects.filter(pk=folder_id)[0]
     folders = Folder.objects.all()[:20]
