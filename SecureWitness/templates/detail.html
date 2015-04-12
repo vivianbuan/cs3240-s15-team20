@@ -28,5 +28,14 @@
 			{% endif %}
 		</div>
 	</div>
+	<form action="{% url 'reports:delete' report.pk %}" method="post"> 
+		{% csrf_token %}
+		<div class="form-actions"> 
+			<button type="submit" form-action="{% url 'reports:edit' report.pk %} formmethod="get" class="btn btn-primary" name="Edit" value="Edit">Edit</button>
+		</div>
+		<div class="form-actions">
+			<button type="submit" class="btn btn-primary" name="delete" value="Delete">Delete</button>
+		</div>
+	</form>
 
 {% endblock %}

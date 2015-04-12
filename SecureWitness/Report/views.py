@@ -24,6 +24,27 @@ def detail(request, pk):
 
 
 
+def delete(request, pk): 
+	if request.method == 'POST': 
+		rep = reports.objects.all().filter(pk=pk)[0]
+		doc = Document.objects.all().filter(report = rep)
+
+		rep.delete()
+		for docs in doc: 
+			docs.delete()
+
+		
+	entries = reports.objects.all()[:20]
+	return render(request, 'index.html', {'report': entries})
+
+
+def edit(request, pk): 
+	if request.method == 'POST': 
+		pass
+	rep = reports.objects.all().filter(pk=pk)[0]
+	return render(request, 'edit.html', {'report': rep})
+
+
 def add_report(request):
 	if request.method == 'POST':
 		# Handle files
