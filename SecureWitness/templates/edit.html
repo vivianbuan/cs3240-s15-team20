@@ -8,40 +8,48 @@ Edit Report | SecureWitness
 	<h2> Report </h2>
 {% endblock %}
 
-{% block content %} 
+{% block content %}
 <form action="{% url 'reports:edit' report.pk %}" method="post" enctype="multipart/form-data" role="form">
 	{% csrf_token %} 
 	<div class="form-group">
-		<input type="hidden" class="form-control" placeholder="Author" name="author" value="{{ user.username }}"></input>
+		<input type="hidden" class="form-control" name="author" value="{{ user.username }}"></input>
 	</div>
 	<div class="form-group">
 		<label for="name">Short Description</label>
-		<input type="text" class="form-control" placeholder="Short Description" name="short" value="{{ report.short }}"></input>
+		<input type="text" class="form-control" name="short" value="{{ report.short }}"></input>
 	</div>
 	<div class="form-group">
 		<label for="name">Long Description</label>
-		<textarea class="form-control" rows="10" placeholder="Long Description" name="details" value="{{ report.details }}"></textarea>
+		<textarea class="form-control" rows="10" name="details" >{{ report.details }}</textarea>
 	</div>
 	<div class="form-group">
 		<label for="name">Location</abel>
-		<input type="text" class="form-control" placeholder="(optional)" name="location" value="{{ report.location }}"></input>
+		<input type="text" class="form-control" name="location" value="{{ report.location }}"></input>
 	</div>
 	<div class="form-group">
 		<label for="name">Date</label> 
-		<input type="date" class="form-control" name="date"></input>
+		<input type="date" class="form-control" name="date" value="{{ report.date }}"></input>
 	</div>
 	<div class="form-group">
 		<label for="name">Keywords</label>
-		<input type="text" class="form-control" placeholder="(optional)" name="keywords"  value="{{ report.keywords }}"></input>
+		<input type="text" class="form-control" name="keywords"  value="{{ report.keywords }}"></input>
 	</div>
 	<div class="form-group">
 		<label for="name">Attachment</label>
-		<input type="file" class="form-control" name="files[]" multiple="true"></input>
+		<input type="file" class="form-control" name="files[]" multiple="true"></input> 
+		{% if documents %} 
+			<br /> 
+			Check the existing attachments you want to remove: <br />
+			{% for document in documents %} 
+				<input type="checkbox" name="{{ document.docfile.name }}"> {{ document.docfile.name }} </input> <br />
+			{% endfor %}
+		{% endif %} 
+		
 	</div>
 	<div class="form-group">
 		<label for="name">Private/Public</label> <br/>
 		{% if report.private %} 
-			<input type="checkbox" name="private" checked></input>
+			<input type="checkbox" name="private" checked> Check if private</input>
 		{% else %} 
 			<input type="checkbox" name="private"></input> 
 		{% endif %}

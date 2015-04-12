@@ -39,17 +39,57 @@ def delete(request, pk):
 
 
 def edit(request, pk): 
-	if request.method == 'POST': 
-		pass
+	# Retrieve the right report
 	rep = reports.objects.all().filter(pk=pk)[0]
-	return render(request, 'edit.html', {'report': rep})
+	doc = Document.objects.all().filter(report = rep)
+	
+	if request.method == 'POST': 
+		# Get possible changes from the form		
+		auth = request.POST.get("author")
+		sh = request.POST.get("short") 
+		det = request.POST.get("details")
+		loc = request.POST.get("location")
+		keys = request.POST.get("keywords")
+		d = request.POST.get("date")		
+		if d == "": 
+			d = None
+		priv = request.POST.get("private", False)
+			
+		if rep.author == auth:
+			# Update the changes
+			rep.short = sh
+			rep.details = det
+			rep.location = loc
+			rep.keywords = keys
+			rep.date = d
+			if priv == "on": 
+				rep.private = True
+			else: 
+				rep.private = priv
+			
+			# Save the changes
+			rep.save()
+
+			# Make changes to existing files
+			for d in doc: 
+				check = request.POST.get(d.docfile.name, False)
+				if check or check == "on": 
+					d.delete()
+						
+			# Upload any new files
+			files = request.FILES.getlist('files[]')
+			for f in files:
+				document = Document(docfile = f, report = rep)
+				document.save() 
+			
+			doc = Document.objects.all().filter(report = rep)
+			return render(request, 'detail.html', {'report': rep, 'documents': doc})
+
+	return render(request, 'edit.html', {'report': rep, 'documents': doc})
 
 
 def add_report(request):
 	if request.method == 'POST':
-		# Handle files
-		
-
 		# Create and save report 
 		auth = request.POST.get("author")
 		sh = request.POST.get("short")
@@ -62,7 +102,7 @@ def add_report(request):
 		priv = request.POST.get("private", False)
 		rep = reports(author = auth, short = sh, details = det, location = loc, date = d, keywords = keys, private = priv)
 		rep.save()
-
+		# Save Files associated to the report
 		files = request.FILES.getlist('files[]')
 		for f in files: 
 			doc = Document(docfile = f, report = rep)
