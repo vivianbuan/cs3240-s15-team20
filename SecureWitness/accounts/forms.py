@@ -28,6 +28,38 @@ class GroupCreationForm(forms.Form):
         g.group = group
         g.save()
 
+class GroupAdditionForm(forms.Form):
+    username = forms.CharField(max_length=254)
+
+    error_messages = {
+        'invalid_username': "A user with that username does not exist.",
+    }
+
+    def __init__(self, request=None, *args, **kwargs):
+        """
+        The 'request' parameter is set for custom auth use by subclasses.
+        The form data comes in via the standard 'data' kwarg.
+        """
+        self.request = request
+        self.user_cache = None
+        super(GroupAdditionForm, self).__init__(*args, **kwargs)
+
+        # Set the label for the "username" field.
+
+    def clean_username(self):
+        username = self.cleaned_data["username"]
+        users = User.objects.filter(username=username)
+        if len(users) == 0:
+            raise forms.ValidationError(
+                self.error_messages['invalid_username'],
+                code='invalid_username',
+            )
+        else:
+            return username
+        
+    def save(self):
+        return User.objects.filter(username=self.cleaned_data["username"])[0]
+
 
 
 class UserGroupCreationForm(forms.Form):

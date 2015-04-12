@@ -27,5 +27,9 @@ class UserProfile(models.Model):
 class UserGroup(models.Model):
     group = models.OneToOneField(Group)
 
+    @property
+    def user_set(self):
+        return self.group.user_set
+
     def __str__(self):
         return self.group.name

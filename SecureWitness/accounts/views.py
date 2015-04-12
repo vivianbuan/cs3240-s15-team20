@@ -11,7 +11,7 @@ from django.db.models import Q
 from accounts.models import UserProfile, UserGroup
 from Report.models import Folder
 from Report.models import reports
-from accounts.forms import GroupCreationForm, UserGroupCreationForm
+from accounts.forms import GroupCreationForm, UserGroupCreationForm, GroupAdditionForm
 from django.contrib.auth.decorators import login_required
 
 
@@ -166,7 +166,8 @@ def admin_group(request, group_id):
     if check_user_fail(request):
         return render(request, 'admin/reject.html')
 
-    return render(request, 'admin/group.html')
+    context = {'g' : UserGroup.objects.filter(pk=group_id)[0]}
+    return render(request, 'admin/group.html', context)
 
 @sensitive_post_parameters()
 @csrf_protect
@@ -210,9 +211,27 @@ def admin_makeadmin(request, user_id):
     return render(request, 'admin/action_complete.html')
 
 
-def admin_group_adduser(request):
+def admin_group_adduser(request, group_id, addition_form=GroupAdditionForm):
     if check_user_fail(request):
         return render(request, 'admin/reject.html')
+
+    if request.method == "POST":
+        form = addition_form(data=request.POST)
+        if form.is_valid() :
+            user = form.save()
+            group = UserGroup.objects.filter(pk=group_id)[0]
+            group.group.user_set.add(user)
+            group.save()
+            group.group.save()
+            return HttpResponseRedirect("/accounts/admin")
+    else :
+        form = addition_form(request)
+
+    context = {
+        'form': form,
+        'g': UserGroup.objects.filter(pk=group_id)[0]
+    }
+    return render(request, "admin/group_adduser.html", context)
 
 def check_user_fail(request):
     try:

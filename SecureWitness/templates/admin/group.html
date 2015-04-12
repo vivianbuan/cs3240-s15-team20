@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Admin | SecureWitness{% endblock %}
+
+{% block content_title %}
+  <h2>Group</h2>
+{% endblock %}
+
+{% block content %}
+<h3> {{ g }} </h3>
+<div class="list-group">
+	<ul class="list-group">
+	{% for user in g.user_set.all %}
+		<a href="{% url 'accounts:admin_user' user.pk %}" class="list-group-item">
+			<h3> {{ user }} </h3>
+		</a>
+	{% endfor %}
+	</ul>
+</div>
+<a href="{% url 'accounts:admin_group_adduser' g.pk %}" class="btn btn-primary">
+	Add User
+</a>
+{% endblock %}
