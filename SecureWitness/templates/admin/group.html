@@ -8,14 +8,21 @@
 
 {% block content %}
 <h3> {{ g }} </h3>
-<div class="list-group">
-	<ul class="list-group">
-	{% for user in g.user_set.all %}
-		<a href="{% url 'accounts:admin_user' user.pk %}" class="list-group-item">
-			<h3> {{ user }} </h3>
-		</a>
+<div class="list-group container-fluid">
+	{% for user in user_set.all %}
+		<div class="list-group-item row">
+			<div class="col-xs-6">
+				<a href="{% url 'accounts:admin_user' user.pk %}" >
+					<h3>{{ user}}</h3>
+				</a>
+			</div>
+			<div class="col-xs-6 text-right">
+			<a href="{% url 'accounts:admin_group_removeuser' g.pk user.pk %}" class="btn btn-primary">
+				<h4>Remove From Group</h4>
+			</a>
+			</div>
+		</div>
 	{% endfor %}
-	</ul>
 </div>
 <a href="{% url 'accounts:admin_group_adduser' g.pk %}" class="btn btn-primary">
 	Add User

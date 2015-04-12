@@ -214,7 +214,9 @@ def admin_group(request, group_id):
     if check_user_fail(request):
         return render(request, 'admin/reject.html')
 
-    context = {'g' : UserGroup.objects.filter(pk=group_id)[0]}
+    user_set = UserProfile.objects.filter(user__groups=UserGroup.objects.filter(pk=group_id)[0].group)
+
+    context = {'g' : UserGroup.objects.filter(pk=group_id)[0], 'user_set' : user_set}
     return render(request, 'admin/group.html', context)
 
 @sensitive_post_parameters()
@@ -300,6 +302,16 @@ def admin_group_adduser(request, group_id, addition_form=GroupAdditionForm):
         'g': UserGroup.objects.filter(pk=group_id)[0]
     }
     return render(request, "admin/group_adduser.html", context)
+
+def admin_group_removeuser(request, group_id,user_id):
+    if check_user_fail(request):
+        return render(request, 'admin/reject.html')
+
+    g = UserGroup.objects.filter(pk=group_id)[0]
+    u = UserProfile.objects.filter(pk=user_id)[0].user
+    g.user_set.remove(u)
+    g.save()
+    return render(request, 'admin/action_complete.html')
 
 def check_user_fail(request):
     try:
