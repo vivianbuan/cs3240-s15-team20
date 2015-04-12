@@ -38,7 +38,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'Report',
     'accounts',
-    'fileUpload',
 )
 
 MIDDLEWARE_CLASSES = (

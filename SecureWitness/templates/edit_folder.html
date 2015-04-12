@@ -5,18 +5,18 @@ Add Folder | SecureWitness
 {% endblock %}
 
 {% block content_title %}
-  <h2>New Folder</h2>
+  <h2>Edit "{{ current.file_name }}"</h2>
 {% endblock %}
 
 {% block content %}
-<form action="{% url 'accounts:add_folder' %}" method="post" enctype="multipart/form-data" role="form">
+<form action="{% url 'accounts:edit_folder' current.pk%}" method="post" enctype="multipart/form-data" role="form">
 	{% csrf_token %}
     <div class="form-group">
             <h3>{{ message }}</h3>
     </div>
 	<div class="form-group">
 		<label for="name">File Name</label>
-		<input type="text" class="form-control" placeholder="File Name" name="file_name"></input>
+		<input type="text" class="form-control" placeholder="{{ current.file_name }}" name="file_name" ></input>
 	</div>
 	<div class="form-group">
         {{ form.AddFolderForm }}
@@ -31,7 +31,9 @@ Add Folder | SecureWitness
           </div>
       </div>
 	<div class="form-actions">
-		<button type="submit" class="btn btn-primary"> Add </button>
+        <button type="submit" name="cancel" class="btn btn-primary" value="Cancel"> Cancel </button>
+		<button type="submit" name="save" class="btn btn-primary" value="Save"> Save Change </button>
+        <button type="submit" name="delete" class="btn btn-primary" value="Delete"> Delete </button>
 	</div>
 </form>
 {% endblock %}

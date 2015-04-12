@@ -4,6 +4,7 @@ import time
 
 class Folder(models.Model):
     file_name = models.CharField(max_length=30, default='DEFAULT FOLDER')
+    parent_folder = models.ForeignKey("self", related_name='parents', null=True, default=None)
 
     def __str__(self):
         return self.file_name
@@ -21,7 +22,7 @@ class reports(models.Model):
     folder = models.ForeignKey(Folder, default=1)
 
     def __str__(self) :
-    	return self.title
+    	return self.short
 
 class Document(models.Model):
 	docfile = models.FileField(upload_to='documents/%Y/%m/%d')
