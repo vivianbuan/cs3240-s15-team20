@@ -16,4 +16,5 @@ urlpatterns = patterns('',
     url(r'^admin/modify/user/(\d+)/$', views.admin_makeadmin, name='admin_makeadmin'),
     url(r'^admin/group/(\d+)/$', views.admin_group, name='admin_group'),
     url(r'^admin/group/$', views.admin_creategroup, name='admin_creategroup'),
+    url(r'^admin/group/adduser/$', views.admin_group_adduser, name='admin_group_adduser'),
 )

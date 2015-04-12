@@ -118,6 +118,10 @@ def admin_makeadmin(request, user_id):
     u.save()
     return render(request, 'admin/action_complete.html')
 
+def admin_group_adduser(request):
+    if check_user_fail(request):
+        return render(request, 'admin/reject.html')
+
 def check_user_fail(request):
     try:
         profile = UserProfile.objects.filter(user = request.user)[0]
