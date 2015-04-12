@@ -10,7 +10,6 @@ class Folder(models.Model):
         return self.file_name
 
 
-
 class reports(models.Model):
     author = models.CharField(max_length=30)
     short = models.TextField(max_length=100)
