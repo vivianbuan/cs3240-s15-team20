@@ -11,6 +11,7 @@ class UserProfile(models.Model):
         return self.user.username
 
     administrator = models.BooleanField(default=0)
+    suspended = models.BooleanField(default=0)
 
     @property    
     def is_admin(self):
@@ -22,6 +23,10 @@ class UserProfile(models.Model):
     @property    
     def date_joined(self):
         return self.user.date_joined
+
+    @property    
+    def is_suspended(self):
+        return bool(self.suspended)
 
 
 class UserGroup(models.Model):

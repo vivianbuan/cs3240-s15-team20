@@ -17,5 +17,15 @@
 	Make Administrator
 </a>
 {% endif %}
+
+{% if not u.is_suspended %}
+<a href="{% url 'accounts:admin_suspend' u.pk %}" class="btn btn-primary">
+	Suspend User
+</a>
+{% else %}
+<a href="{% url 'accounts:admin_unsuspend' u.pk %}" class="btn btn-primary">
+	Revoke User Suspension
+</a>
+{% endif %}
 {% endblock %}
 

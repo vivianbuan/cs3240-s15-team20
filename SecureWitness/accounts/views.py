@@ -1,5 +1,7 @@
+from django.conf import settings
+
 from django.shortcuts import render, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, resolve_url
 
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
@@ -12,8 +14,14 @@ from accounts.models import UserProfile, UserGroup
 from Report.models import Folder
 from Report.models import reports
 from accounts.forms import GroupCreationForm, UserGroupCreationForm, GroupAdditionForm
-from django.contrib.auth.decorators import login_required
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import (REDIRECT_FIELD_NAME, login as auth_login,
+    logout as auth_logout, get_user_model, update_session_auth_hash)
+
+from django.template.response import TemplateResponse
+from django.utils.http import is_safe_url
 
 # Create your views here.
 
@@ -42,6 +50,46 @@ def register(request, creation_form=UserCreationForm, extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
     return render(request, "registration/register.html", context)
+
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def login(request, template_name='registration/login.html',
+          redirect_field_name=REDIRECT_FIELD_NAME,
+          authentication_form=AuthenticationForm,
+          current_app=None, extra_context=None):
+    """
+    Displays the login form and handles the login action.
+    """
+    redirect_to = request.POST.get(redirect_field_name,
+                                   request.GET.get(redirect_field_name, ''))
+
+    if request.method == "POST":
+        form = authentication_form(request, data=request.POST)
+        if form.is_valid():
+            # Ensure the user-originating redirection url is safe.
+            if not is_safe_url(url=redirect_to, host=request.get_host()):
+                redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+
+            # Okay, security check complete. Log the user in.
+            profile = UserProfile.objects.filter(user=form.get_user())[0]
+            if profile.is_suspended :
+                return render(request, 'registration/suspended.html')
+
+            auth_login(request, form.get_user())
+
+            return HttpResponseRedirect(redirect_to)
+    else:
+        form = authentication_form(request)
+
+    context = {
+        'form': form,
+        redirect_field_name: redirect_to,
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+    return TemplateResponse(request, template_name, context,
+                            current_app=current_app)
 
 
 def profile(request):
@@ -207,6 +255,26 @@ def admin_makeadmin(request, user_id):
 
     u = UserProfile.objects.filter(pk=user_id)[0]
     u.administrator = 1
+    u.save()
+    return render(request, 'admin/action_complete.html')
+
+def admin_suspend(request, user_id):
+    if check_user_fail(request):
+        return render(request, 'admin/reject.html')
+
+    u = UserProfile.objects.filter(pk=user_id)[0]
+    u.suspended = 1
+    u.user.save()
+    u.save()
+    return render(request, 'admin/action_complete.html')
+
+def admin_unsuspend(request, user_id):
+    if check_user_fail(request):
+        return render(request, 'admin/reject.html')
+
+    u = UserProfile.objects.filter(pk=user_id)[0]
+    u.suspended = 0
+    u.user.save()
     u.save()
     return render(request, 'admin/action_complete.html')
 
