@@ -4,9 +4,11 @@ import time
 
 class Folder(models.Model):
     file_name = models.CharField(max_length=30, default='DEFAULT FOLDER')
+    parent_folder = models.ForeignKey("self", related_name='parents', null=True, default=None)
 
     def __str__(self):
         return self.file_name
+
 
 
 class reports(models.Model):
