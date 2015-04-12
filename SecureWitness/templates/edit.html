@@ -1,0 +1,53 @@
+{% extends "base.html" %} 
+
+{% block title %}
+Edit Report | SecureWitness
+{% endblock %}
+
+{% block content_title %}
+	<h2> Report </h2>
+{% endblock %}
+
+{% block content %} 
+<form action="{% url 'reports:edit' report.pk %}" method="post" enctype="multipart/form-data" role="form">
+	{% csrf_token %} 
+	<div class="form-group">
+		<input type="hidden" class="form-control" placeholder="Author" name="author" value="{{ user.username }}"></input>
+	</div>
+	<div class="form-group">
+		<label for="name">Short Description</label>
+		<input type="text" class="form-control" placeholder="Short Description" name="short" value="{{ report.short }}"></input>
+	</div>
+	<div class="form-group">
+		<label for="name">Long Description</label>
+		<textarea class="form-control" rows="10" placeholder="Long Description" name="details" value="{{ report.details }}"></textarea>
+	</div>
+	<div class="form-group">
+		<label for="name">Location</abel>
+		<input type="text" class="form-control" placeholder="(optional)" name="location" value="{{ report.location }}"></input>
+	</div>
+	<div class="form-group">
+		<label for="name">Date</label> 
+		<input type="date" class="form-control" name="date"></input>
+	</div>
+	<div class="form-group">
+		<label for="name">Keywords</label>
+		<input type="text" class="form-control" placeholder="(optional)" name="keywords"  value="{{ report.keywords }}"></input>
+	</div>
+	<div class="form-group">
+		<label for="name">Attachment</label>
+		<input type="file" class="form-control" name="files[]" multiple="true"></input>
+	</div>
+	<div class="form-group">
+		<label for="name">Private/Public</label> <br/>
+		{% if report.private %} 
+			<input type="checkbox" name="private" checked></input>
+		{% else %} 
+			<input type="checkbox" name="private"></input> 
+		{% endif %}
+	</div>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-primary"> Post </button>
+	</div>
+
+{% endblock %} 
