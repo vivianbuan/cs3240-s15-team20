@@ -30,26 +30,23 @@ from django.utils.http import is_safe_url
 @never_cache
 def register(request, creation_form=UserCreationForm, extra_context=None):
 
-    if request.method == "POST":
+	form = creation_form(request.POST or None)
+	if request.method == "POST":
         # Add User Model instance here
-        form = creation_form(data=request.POST)
-        if form.is_valid() :
-            user = form.save()
-            profile = UserProfile(user = user)
-            profile.save()
-            user = authenticate(username=form.cleaned_data.get("username"),
-                         password=form.cleaned_data.get("password1"))
-            login(request, user)
-            return HttpResponseRedirect("/")
-    else :
-        form = creation_form(request)
-
-    context = {
-        'form': form,
-    }
-    if extra_context is not None:
-        context.update(extra_context)
-    return render(request, "registration/register.html", context)
+	        if form.is_valid() :
+	            user = form.save()
+	            profile = UserProfile(user = user)
+	            profile.save()
+	            user = authenticate(username=form.cleaned_data.get("username"),
+	                         password=form.cleaned_data.get("password1"))
+	            login(request, user)
+	            return HttpResponseRedirect("/")
+	context = {
+		'form': form,
+	}
+	if extra_context is not None:
+		context.update(extra_context)
+	return render(request, "registration/register.html", context)
 
 @sensitive_post_parameters()
 @csrf_protect
@@ -79,8 +76,8 @@ def login(request, template_name='registration/login.html',
             auth_login(request, form.get_user())
 
             return HttpResponseRedirect(redirect_to)
-    else:
-        form = authentication_form(request)
+ 
+    form = authentication_form(request)
 
     context = {
         'form': form,

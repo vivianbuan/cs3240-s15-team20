@@ -14,7 +14,7 @@ from django.contrib.auth.decorators import login_required
 
 
 def home(request):
-    entries = reports.objects.all()[:20]
+    entries = reports.objects.all().filter(private=False)[:20]
     return render(request, 'index.html', {'report': entries})
 
 
@@ -35,7 +35,7 @@ def delete(request, pk):
 			docs.delete()
 
 		
-	entries = reports.objects.all()[:20]
+	entries = reports.objects.all().filter(private=False)[:20]
 	return render(request, 'index.html', {'report': entries})
 
 
@@ -110,7 +110,7 @@ def add_report(request):
 			doc.save()
 
 		# Redirect to home
-		entries = reports.objects.all()[:20]
+		entries = reports.objects.all().filter(private=False)[:20]
 		return render(request, 'index.html', {'report': entries})
 		
 	entries = reports.objects.all()[:20]
