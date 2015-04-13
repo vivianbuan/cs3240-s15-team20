@@ -158,6 +158,10 @@ def edit_folder(request, folder_id):
                     error = "Error: Your target folder " + parent_name + "is  currently in " + current_folder.file_name
                     folders = Folder.objects.all()[:20]
                     return render(request, 'edit_folder.html', {'current': current_folder, 'folder': folders, 'message': error})
+            elif parent == current_folder:
+                    error = "Error: You are trying to put " + current_folder.file_name + " in itself!"
+                    folders = Folder.objects.all()[:20]
+                    return render(request, 'edit_folder.html', {'current': current_folder, 'folder': folders, 'message': error})
             elif len(title) == 0:
                     current_folder.parent_folder = parent
                     current_folder.save()
