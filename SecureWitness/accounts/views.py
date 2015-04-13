@@ -218,7 +218,9 @@ def admin_user(request, user_id):
     if check_user_fail(request):
         return render(request, 'admin/reject.html')
 
-    context = {'u' : UserProfile.objects.filter(pk=user_id)[0]}
+    u = UserProfile.objects.filter(pk=user_id)[0]
+
+    context = {'u' : u, 'isnotme' : u.user != request.user}
     return render(request, 'admin/user.html', context)
 
 
@@ -323,6 +325,15 @@ def admin_group_removeuser(request, group_id,user_id):
     u = UserProfile.objects.filter(pk=user_id)[0].user
     g.user_set.remove(u)
     g.save()
+    return render(request, 'admin/action_complete.html')
+
+def admin_group_delete(request, group_id):
+    if check_user_fail(request):
+        return render(request, 'admin/reject.html')
+
+    g = UserGroup.objects.filter(pk=group_id)[0]
+    g.group.delete()
+    g.delete()
     return render(request, 'admin/action_complete.html')
 
 def check_user_fail(request):
