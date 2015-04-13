@@ -72,7 +72,18 @@ def login(request, template_name='registration/login.html',
                 redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
 
             # Okay, security check complete. Log the user in.
-            profile = UserProfile.objects.filter(user=form.get_user())[0]
+            profile = UserProfile.objects.filter(user=form.get_user())
+            if len(profile) is 0:
+                context = {
+                    'form': form,
+                    redirect_field_name: redirect_to,
+                }
+                if extra_context is not None:
+                    context.update(extra_context)
+                return TemplateResponse(request, template_name, context,
+                                        current_app=current_app)
+
+            profile = profile[0]
             if profile.is_suspended :
                 return render(request, 'registration/suspended.html')
 
