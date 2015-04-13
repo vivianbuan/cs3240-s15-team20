@@ -9,6 +9,7 @@ from Report.models import Folder
 from pprint import pprint
 import time
 from datetime import date
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -87,7 +88,7 @@ def edit(request, pk):
 
 	return render(request, 'edit.html', {'report': rep, 'documents': doc})
 
-
+@login_required(login_url="/accounts/login/")
 def add_report(request):
 	if request.method == 'POST':
 		# Create and save report 
