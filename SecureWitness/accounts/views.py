@@ -30,26 +30,23 @@ from django.utils.http import is_safe_url
 @never_cache
 def register(request, creation_form=UserCreationForm, extra_context=None):
 
-    if request.method == "POST":
+	form = creation_form(request.POST or None)
+	if request.method == "POST":
         # Add User Model instance here
-        form = creation_form(data=request.POST)
-        if form.is_valid() :
-            user = form.save()
-            profile = UserProfile(user = user)
-            profile.save()
-            user = authenticate(username=form.cleaned_data.get("username"),
-                         password=form.cleaned_data.get("password1"))
-            login(request, user)
-            return HttpResponseRedirect("/")
-    else :
-        form = creation_form(request)
-
-    context = {
-        'form': form,
-    }
-    if extra_context is not None:
-        context.update(extra_context)
-    return render(request, "registration/register.html", context)
+	        if form.is_valid() :
+	            user = form.save()
+	            profile = UserProfile(user = user)
+	            profile.save()
+	            user = authenticate(username=form.cleaned_data.get("username"),
+	                         password=form.cleaned_data.get("password1"))
+	            login(request, user)
+	            return HttpResponseRedirect("/")
+	context = {
+		'form': form,
+	}
+	if extra_context is not None:
+		context.update(extra_context)
+	return render(request, "registration/register.html", context)
 
 @sensitive_post_parameters()
 @csrf_protect
@@ -72,15 +69,26 @@ def login(request, template_name='registration/login.html',
                 redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
 
             # Okay, security check complete. Log the user in.
-            profile = UserProfile.objects.filter(user=form.get_user())[0]
+            profile = UserProfile.objects.filter(user=form.get_user())
+            if len(profile) is 0:
+                context = {
+                    'form': form,
+                    redirect_field_name: redirect_to,
+                }
+                if extra_context is not None:
+                    context.update(extra_context)
+                return TemplateResponse(request, template_name, context,
+                                        current_app=current_app)
+
+            profile = profile[0]
             if profile.is_suspended :
                 return render(request, 'registration/suspended.html')
 
             auth_login(request, form.get_user())
 
             return HttpResponseRedirect(redirect_to)
-    else:
-        form = authentication_form(request)
+ 
+    form = authentication_form(request)
 
     context = {
         'form': form,
@@ -225,7 +233,9 @@ def admin_user(request, user_id):
     if check_user_fail(request):
         return render(request, 'admin/reject.html')
 
-    context = {'u' : UserProfile.objects.filter(pk=user_id)[0]}
+    u = UserProfile.objects.filter(pk=user_id)[0]
+
+    context = {'u' : u, 'isnotme' : u.user != request.user}
     return render(request, 'admin/user.html', context)
 
 
@@ -330,6 +340,15 @@ def admin_group_removeuser(request, group_id,user_id):
     u = UserProfile.objects.filter(pk=user_id)[0].user
     g.user_set.remove(u)
     g.save()
+    return render(request, 'admin/action_complete.html')
+
+def admin_group_delete(request, group_id):
+    if check_user_fail(request):
+        return render(request, 'admin/reject.html')
+
+    g = UserGroup.objects.filter(pk=group_id)[0]
+    g.group.delete()
+    g.delete()
     return render(request, 'admin/action_complete.html')
 
 def check_user_fail(request):

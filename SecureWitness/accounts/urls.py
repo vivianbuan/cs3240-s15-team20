@@ -4,6 +4,7 @@ from accounts import views
 
 
 urlpatterns = patterns('',
+    url(r'^$', views.profile, name='home'),
 	url(r'^login/$', views.login, name='login'),
     url(r'^logout/$', 'django.contrib.auth.views.logout', name='logout'),
     url(r'^changepw/$', 'django.contrib.auth.views.password_change', name='password_change'),
@@ -22,5 +23,6 @@ urlpatterns = patterns('',
     url(r'^admin/group/$', views.admin_creategroup, name='admin_creategroup'),
     url(r'^admin/group/(\d+)/adduser/$', views.admin_group_adduser, name='admin_group_adduser'),
     url(r'^admin/group/(\d+)/removeuser/(\d+)/$', views.admin_group_removeuser, name='admin_group_removeuser'),
+    url(r'^admin/group/(\d+)/delete$', views.admin_group_delete, name='admin_group_delete'),
     url(r'^add_group/$', views.add_group, name='add_group'),
 )

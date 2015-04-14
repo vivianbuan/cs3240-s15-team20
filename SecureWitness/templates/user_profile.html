@@ -3,9 +3,12 @@
 {% block title %}Home | SecureWitness{% endblock %}
 
 {% block content_title %}
-  <h2>{{ prof }}'s Profile (<a href="{% url 'accounts:admin_page' %}">Administrator</a>)</h2>
-  <h3 align="left"> <a href="{% url 'reports:add_report' %}" class = "btn btn-primary"> Add Report</a></h3>
-  <h3 align="left"> <a href="{% url 'accounts:add_folder' %}" class = "btn btn-primary"> Add Folder</a></h3>
+  <h2>
+  	{{ prof }}'s Profile 
+  	{% if prof.is_admin %}
+  	(<a href="{% url 'accounts:admin_page' %}">Administrator</a>)
+  	{% endif %}
+  </h2>
 {% endblock %}
 
 {% block content %}
