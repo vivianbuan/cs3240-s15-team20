@@ -91,84 +91,107 @@ def login(request, template_name='registration/login.html',
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
 
-
+@login_required(login_url="/accounts/login/")
 def profile(request):
-    folders = Folder.objects.all()[:20]
-    if len(folders) == 0:
-        folder = Folder()
-        folder.save()
-        # folders = Folder.objects.all()[:20]
     # This code allows for an admin link on the user profile page.
     if request.user.is_active:
         profile = UserProfile.objects.filter(user=request.user)[0]
     else:
         profile = None
 
-    root_folder = Folder.objects.get(pk=1)
+    folders = profile.folder_set.all()[:20]
+
+    if len(folders) == 0:
+        folder = Folder()
+        if request.user.is_active:
+            folder.owner = UserProfile.objects.filter(user=request.user)[0]
+        folder.save()
+        # folders = Folder.objects.all()[:20]
+
+    root_folder = profile.folder_set.filter(file_name="DEFAULT FOLDER")[0]
     return render(request, 'user_profile.html', {'o': root_folder, 'prof': profile})
 
 
+@login_required(login_url="/accounts/login/")
 def report_list(request, folder_id):
-    return render(request, 'report_list.html', {'folder': Folder.objects.filter(pk=folder_id)[0]})
+    if request.user.is_active:
+        profile = UserProfile.objects.filter(user=request.user)[0]
+    else:
+        profile = None
+
+    folders = profile.folder_set.all()
+    return render(request, 'report_list.html', {'folder': folders.filter(pk=folder_id)[0]})
 
 
+@login_required(login_url="/accounts/login/")
 def add_folder(request):
+    if request.user.is_active:
+        profile = UserProfile.objects.filter(user=request.user)[0]
+    else:
+        profile = None
+
     if request.method == 'POST':
         title = request.POST.get("file_name")
+        name_line = request.POST.get("parent_folder").split("/")
+        parent_id = name_line[1]
 
         # handel invalid input
         if len(title) == 0:
             error = "Error: folder name needed!"
-            folders = Folder.objects.all()[:20]
-            return render(request, 'add_folder.html', {'folder': folders, 'message': error})
-        elif Folder.objects.filter(file_name=title).count() != 0:
-            error = "Error: folder already exist!"
-            folders = Folder.objects.all()[:20]
+            folders = profile.folder_set.all()[:20]
             return render(request, 'add_folder.html', {'folder': folders, 'message': error})
         else:
-            parent_name = request.POST.get("parent_folder")
-            parent = Folder.objects.get(file_name=parent_name)
-            folder = Folder(file_name=title, parent_folder=parent)
-            folder.save()
+            parent = profile.folder_set.get(pk=parent_id)
+            if parent.parents.filter(file_name=title).count() != 0:
+                error = "Error: folder already exist in directory " + parent.file_name
+                folders = profile.folder_set.all()[:20]
+                return render(request, 'add_folder.html', {'folder': folders, 'message': error})
+            else:
+                folder = Folder(file_name=title, parent_folder=parent, owner=profile)
+                folder.save()
 
-        if request.user.is_active:
-            profile = UserProfile.objects.filter(user = request.user)[0]
-        else:
-            profile = None
 
-        root_folder = Folder.objects.get(pk=1)
+        root_folder = profile.folder_set.filter(file_name="DEFAULT FOLDER")[0]
         return render(request, 'user_profile.html', {'o': root_folder, 'prof': profile})
 
-    folders = Folder.objects.all()[:20]
+    folders = profile.folder_set.all()[:20]
     error = ""
     return render(request, 'add_folder.html', {'folder': folders, 'message': error})
 
 
+@login_required(login_url="/accounts/login/")
 def edit_folder(request, folder_id):
+    if request.user.is_active:
+        profile = UserProfile.objects.filter(user=request.user)[0]
+    else:
+        profile = None
+
+    current_folder = profile.folder_set.filter(pk=folder_id)[0]
+    folders = profile.folder_set.all()[:20]
+
     if request.method == 'POST':
         # handle different request
         if request.POST.get("cancel"):     # Cancel
-            return render(request, 'report_list.html', {'folder': Folder.objects.filter(pk=folder_id)[0]})
+            return render(request, 'report_list.html', {'folder': current_folder})
         elif request.POST.get("save"):     # Save changes
-            current_folder = Folder.objects.filter(pk=folder_id)[0]
             title = request.POST.get("file_name")
-            parent_name = request.POST.get("parent_folder")
-            parent = Folder.objects.get(file_name=parent_name)
+            name_line = request.POST.get("parent_folder").split("/")
+            parent_id = name_line[1]
+            parent = profile.folder_set.get(pk=parent_id)
+            # parent_name = request.POST.get("parent_folder")
+            # parent = Folder.objects.get(file_name=parent_name)
             if parent.parent_folder == current_folder:
-                    error = "Error: Your target folder " + parent_name + "is  currently in " + current_folder.file_name
-                    folders = Folder.objects.all()[:20]
+                    error = "Error: Your target folder " + parent.file_name + "is  currently in " + current_folder.file_name
                     return render(request, 'edit_folder.html', {'current': current_folder, 'folder': folders, 'message': error})
             elif parent == current_folder:
                     error = "Error: You are trying to put " + current_folder.file_name + " in itself!"
-                    folders = Folder.objects.all()[:20]
                     return render(request, 'edit_folder.html', {'current': current_folder, 'folder': folders, 'message': error})
             elif len(title) == 0:
                     current_folder.parent_folder = parent
                     current_folder.save()
                     return render(request, 'report_list.html', {'folder': current_folder})
             elif parent.parents.filter(file_name=title).count() != 0:
-                error = "Error: Folder " + title + " already exist in the target folder " + parent_name
-                folders = Folder.objects.all()[:20]
+                error = "Error: Folder " + title + " already exist in the target folder " + parent.file_name
                 return render(request, 'edit_folder.html', {'current': current_folder, 'folder': folders, 'message': error})
             else:
                     current_folder.file_name = title
@@ -177,20 +200,12 @@ def edit_folder(request, folder_id):
                     return render(request, 'report_list.html', {'folder': current_folder})
         elif request.POST.get("delete"):   # Delete folder
             get_object_or_404(Folder, pk=folder_id).delete()
-            root_folder = Folder.objects.get(pk=1)
-            if request.user.is_active:
-                profile = UserProfile.objects.filter(user = request.user)[0]
-            else:
-                profile = None
+            root_folder = profile.folder_set.filter(file_name="DEFAULT FOLDER")[0]
             return render(request, 'user_profile.html', {'o': root_folder, 'prof': profile})
         else:                               # only for debug issue
             error = "Error: button not working!"
-            current_folder = Folder.objects.filter(pk=folder_id)[0]
-            folders = Folder.objects.all()[:20]
             return render(request, 'edit_folder.html', {'current': current_folder, 'folder': folders, 'message': error})
 
-    current_folder = Folder.objects.filter(pk=folder_id)[0]
-    folders = Folder.objects.all()[:20]
     error = ""
     return render(request, 'edit_folder.html', {'current': current_folder, 'folder': folders, 'message': error})
 

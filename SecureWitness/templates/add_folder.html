@@ -19,13 +19,13 @@ Add Folder | SecureWitness
 		<input type="text" class="form-control" placeholder="File Name" name="file_name"></input>
 	</div>
 	<div class="form-group">
-        {{ form.AddFolderForm }}
+{#        {{ form.AddFolderForm }}#}
 		<label for="name">Parent Folder</label>
 {#		<input type="text" class="form-control" placeholder="Parent Folder" name="parent_folder"></input>#}
             <div class="btn-group">
         <select class="form-control"  name="parent_folder">
             {%for t in folder%}
-                <option value="{{t.file_name}}" name="parent_name">{{t.file_name}}</option>
+                <option value="{{t.parent_folder.pk }}/{{t.pk}}" name="parent_name">{{t.parent_folder.file_name }} / {{t.file_name}}</option>
             {%endfor%}
         </select>
           </div>
