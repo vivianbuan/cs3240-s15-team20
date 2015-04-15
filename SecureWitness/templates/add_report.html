@@ -38,6 +38,16 @@ Add Report | SecureWitness
 		<label for="name">Attachment</label>
 		<input type="file" class="form-control" name="files[]" multiple="true"></input>
 	</div>
+    <div class="form-group">
+		<label for="name">Parent Folder</label>
+            <div class="btn-group">
+        <select class="form-control"  name="parent_folder">
+            {%for t in folder%}
+                <option value="{{t.parent_folder.pk }}/{{t.pk}}" name="parent_name">{{t.parent_folder.file_name }} / {{t.file_name}}</option>
+            {%endfor%}
+        </select>
+          </div>
+    </div>
 	<div class="form-group">
 		<label for="name">Private/Public</label> <br/>
 		<input type="checkbox" name="private" value="Private"></input>

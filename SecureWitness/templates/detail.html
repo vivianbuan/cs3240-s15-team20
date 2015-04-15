@@ -28,13 +28,17 @@
 			{% endif %}
 		</div>
 	</div>
+{#    <div class="form-actions">#}
+{#        <button type="submit" name="edit" class="btn btn-primary" value="Edit"> Edit </button>#}
+{#        <button type="submit" name="delete" class="btn btn-primary" value="Delete"> Delete </button>#}
+{#	</div>#}
 	<form action="{% url 'reports:edit' report.pk %}" method="post">
 		{% csrf_token %}
 		<div class="form-actions">
 			<button type="submit" class="btn btn-primary" name="edit" value="Edit">Edit</button>
 		</div>
 	</form>
-	<form action="{% url 'reports:delete' report.pk %}" method="post"> 
+	<form action="{% url 'reports:delete' report.pk %}" method="post">
 		{% csrf_token %}
 		<div class="form-actions">
 			<button type="submit" class="btn btn-primary" name="delete" value="Delete">Delete</button>

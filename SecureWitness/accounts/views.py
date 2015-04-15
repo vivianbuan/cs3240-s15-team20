@@ -111,8 +111,7 @@ def profile(request):
 
     if len(folders) == 0:
         folder = Folder()
-        if request.user.is_active:
-            folder.owner = UserProfile.objects.filter(user=request.user)[0]
+        folder.owner = profile
         folder.save()
         # folders = Folder.objects.all()[:20]
 
@@ -177,7 +176,7 @@ def edit_folder(request, folder_id):
     current_folder = profile.folder_set.filter(pk=folder_id)[0]
     folders = profile.folder_set.all()[:20]
 
-    if request.method == 'POST':
+    if request.method == 'POST' and request.POST.get("click"):
         # handle different request
         if request.POST.get("cancel"):     # Cancel
             return render(request, 'report_list.html', {'folder': current_folder})
