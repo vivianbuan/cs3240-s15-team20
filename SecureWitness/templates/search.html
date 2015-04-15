@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+    <form method="get" action="{% url 'reports:search' %}">
+        <label for="id_q">Search:</label>
+           <input type="text" name="q" id="id_q"/>
+           <input type="submit" value="Submit"/>
+        </form>
+    <ul style="list-style: none;">
+    <li>{% for r in found_entries %}
+		<a href="{% url 'reports:detail' r.pk%}" class="list-group-item">
+			<h3> {{ r.short }} </h3>
+			<h4> Posted on {{ r.timestamp }} by {{ r.author}}</h4>
+		</a>
+	{%  endfor %}
+    </li>
+    </ul>
+{% endblock %}

@@ -92,9 +92,19 @@
                     <li role="presentation">
                         <a href="{% url 'accounts:add_group' %}"> Add Group</a>
                     </li>
+                     <li role="presentation">
+                        <a href="{% url 'reports:search' %}"> Search </a>
+                    </li>
+
+   </div>
+</form>
+
                     {% block extralinks %}{% endblock %}
                 </ul>
             </div>
+
+
+
         </div>
     </nav>
     {% endblock %}
