@@ -192,7 +192,7 @@ def search(request):
     if ('q' in request.GET) and request.GET['q'].strip():
         query_string = request.GET['q']
 
-        entry_query = get_query(query_string, ['author', 'details', 'short',])
+        entry_query = get_query(query_string, ['author', 'details', 'short','keywords',])
 
         found_entries = reports.objects.filter(entry_query)
 
