@@ -1,15 +1,23 @@
 {% extends "base.html" %}
 
-
+{% block title %}Search Reports | SecureWitness{% endblock %}
+{% block content_title %}
+  <h2>Search Reports</h2>
+{% endblock %}
 
 {% block content %}
-    <form method="get" action="{% url 'reports:search' %}">
-        <label for="id_q">Search:</label>
-           <input type="text" name="q" id="id_q"/>
-           <input type="submit" value="Submit"/>
-        </form>
-    <ul style="list-style: none;">
-    <li>{% for r in found_entries %}
+    <form class="well-sm" method="get" action="{% url 'reports:search' %}">
+        <div class="input-group">
+            <input type="text" class="form-control" name="q" id="id_q" placeholder="Search for...">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="submit">
+                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                </button>
+            </span>
+        </div>
+    </form>
+    <div class="list-group well-lg">
+    {% for r in found_entries %}
         {% if r.private == False %}
 		<a href="{% url 'reports:detail' r.pk%}" class="list-group-item">
 			<h3> {{ r.short }} </h3>
@@ -17,6 +25,5 @@
 		</a>
         {% endif %}
 	{%  endfor %}
-    </li>
-    </ul>
+    </div>
 {% endblock %}

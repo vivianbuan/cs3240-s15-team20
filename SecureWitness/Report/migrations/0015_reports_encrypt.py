@@ -15,5 +15,6 @@ class Migration(migrations.Migration):
             model_name='reports',
             name='encrypt',
             field=models.BooleanField(default=False),
+            preserve_default=True,
         ),
     ]

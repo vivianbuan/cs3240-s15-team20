@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="list-group">
+<div class="list-group" id="Reports">
 	{% for r in report %}
 		<a href="{% url 'reports:detail' r.pk%}" class="list-group-item">
 			<h3> {{ r.short }} </h3>

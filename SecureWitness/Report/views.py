@@ -82,7 +82,7 @@ def edit(request, pk):
         if d == "":
             d = None
         priv = request.POST.get("private", False)
-	enc = request.POST.get("encrypt", False) 
+        enc = request.POST.get("encrypt", False) 
 
         if rep.author == auth:
             # Update the changes
@@ -95,10 +95,10 @@ def edit(request, pk):
                 rep.private = True
             else:
                 rep.private = priv
-	    if enc == "on": 
-		rep.encrypt = True
-	    else: 
-		rep.encrypt = enc
+        if enc == "on": 
+            rep.encrypt = True
+        else: 
+            rep.encrypt = enc
             rep.folder = parent
             # Save the changes
             rep.save()
@@ -141,7 +141,7 @@ def add_report(request):
             d = None
         keys = request.POST.get("keywords")
         priv = request.POST.get("private", False)
-	enc = request.POST.get("encrypt", False)
+        enc = request.POST.get("encrypt", False)
 
         name_line = request.POST.get("parent_folder").split("/")
         parent_id = name_line[1]
