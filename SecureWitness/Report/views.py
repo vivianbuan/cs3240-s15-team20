@@ -16,7 +16,6 @@ from django.db.models import Q
 from django.template import RequestContext
 from Crypto.Cipher import AES
 from Crypto import Random
-import cStringIO
 import os
 from django.core.files import File
 
@@ -152,36 +151,36 @@ def add_report(request):
         rep.save()
         # Save Files associated to the report
         files = request.FILES.getlist('files[]')
-	if enc: 
-	    key = os.urandom(16)  #  Generate Key
-	    enckey = str(key)
+        if enc: 
+            key = os.urandom(16)  #  Generate Key
+            enckey = str(key)
             for f in files:
-		filename = f.name + ".enc"
-		with open(str(filename), 'wb') as out_file: 
-	    		chunk_size = 8192 
-			iv = Random.new().read(AES.block_size)
-	    		crypt = AES.new(key, AES.MODE_CBC, iv) 
-			out_file.write(iv)
-			for chunk in f.chunks(chunk_size):
-				if len(chunk) % 16 != 0: 
-					chunk += b' ' * (16 - len(chunk) % 16)
-				out_file.write(crypt.encrypt(chunk)) 
-		with open(str(filename), 'rb') as out_file:
-			enc_file = File(out_file) 
-			doc = Document(docfile=enc_file, report=rep)
-			doc.save() 
-		os.remove(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), str(filename)))
-	    pprint(enckey, sys.stderr)	
-	    doc = Document.objects.all().filter(report=rep) 		
-	    return render(request, 'encUpload.html', {'report': rep, 'documents': doc, 'enckey': enckey})
-	else: 
-	    for f in files: 
-		doc = Document(docfile=f, report=rep)
-		doc.save() 
-		
+                filename = f.name + ".enc"
+            with open(str(filename), 'wb') as out_file: 
+                chunk_size = 8192 
+                iv = Random.new().read(AES.block_size)
+                crypt = AES.new(key, AES.MODE_CBC, iv) 
+                out_file.write(iv)
+                for chunk in f.chunks(chunk_size):
+                    if len(chunk) % 16 != 0: 
+                        chunk += b' ' * (16 - len(chunk) % 16)
+                    out_file.write(crypt.encrypt(chunk)) 
+            with open(str(filename), 'rb') as out_file:
+                enc_file = File(out_file) 
+                doc = Document(docfile=enc_file, report=rep)
+                doc.save() 
+            os.remove(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), str(filename)))
+            pprint(enckey, sys.stderr)	
+            doc = Document.objects.all().filter(report=rep) 		
+            return render(request, 'encUpload.html', {'report': rep, 'documents': doc, 'enckey': enckey})
+        else: 
+            for f in files: 
+                doc = Document(docfile=f, report=rep)
+                doc.save() 
+
             entries = reports.objects.all().filter(private=False)
-	    return render(request, 'index.html', {'report': entries})
-		
+            return render(request, 'index.html', {'report': entries})
+        
 
     entries = reports.objects.all()[:20]
     folders = profile.folder_set.all()[:20]
