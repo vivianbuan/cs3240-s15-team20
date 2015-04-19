@@ -1,5 +1,5 @@
 {% load admin_static %}{% load firstof from future %}<!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %} charset="utf-8">
 <head>
 <title>{% block title %}{% endblock %}</title>
 
@@ -65,7 +65,7 @@
     </div>
     <!-- END Header -->
     {% block navbar %}
-    <nav class="navbar navbar-inverse">
+    <nav class="navbar navbar-inverse" id="navbar">
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
