@@ -6,7 +6,7 @@ from accounts.models import UserProfile
 class Mail(models.Model):
     title = models.TextField(max_length=30, default='No Title')
     details = models.TextField()
-    date = models.DateTimeField(auto_now_add=True, null=True, default=None)
+    date = models.DateTimeField(auto_now_add=True, null=True)
     from_user = models.ForeignKey(UserProfile, related_name='sent_mails', null=True, default=None)
     to_user = models.ForeignKey(UserProfile, related_name='receive_mails', null=True, default=None)
 

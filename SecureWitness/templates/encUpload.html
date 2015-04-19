@@ -1,0 +1,12 @@
+{% extends "base.html" %} 
+
+{% block title %}Successful Upload | SecureWitness{% endblock %}
+{% block content_title %} 
+  <h2>Successfully uploaded {{report.short}} by {{report.author}}</h2>
+{% endblock %} 
+
+{% block content %} 
+	<h3> Key associated with the encrypted files: {{ enckey }} </h5> 
+	<p> Please store this key as it will be needed for access the files in the future! </p> 
+	<a href="{% url 'home' %}">Back to Home Page</a> 
+{% endblock %} 
