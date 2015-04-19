@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Home | SecureWitness{% endblock %}
+{% block content_title %}
+  <h2>{{m.title}}</h2>
+  <p> From: {{ m.from_user }}
+{% endblock %}
+
+{% block content %}
+	<h5>Received on {{ m.date }} from {{ m.from_user}}</h5>
+	<div class="panel panel-default">
+		<div class=panel-body>
+            <p>
+				{{ m.details }}
+			</p>
+		</div>
+	</div>
+{% endblock %}

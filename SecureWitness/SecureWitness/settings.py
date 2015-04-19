@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'Report',
     'accounts',
+    'SiteMail',
 )
 
 MIDDLEWARE_CLASSES = (

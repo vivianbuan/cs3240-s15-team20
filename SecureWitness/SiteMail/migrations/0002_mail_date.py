@@ -5,15 +5,16 @@ from django.db import models, migrations
 
 
 class Migration(migrations.Migration):
+
     dependencies = [
-        ('accounts', '0002_userprofile_administrator'),
+        ('SiteMail', '0001_initial'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='userprofile',
-            name='suspended',
-            field=models.BooleanField(default=0),
+            model_name='mail',
+            name='date',
+            field=models.DateTimeField(null=True, auto_now_add=True, default=None),
             preserve_default=True,
         ),
     ]

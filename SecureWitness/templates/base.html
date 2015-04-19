@@ -95,8 +95,11 @@
                      <li role="presentation">
                         <a href="{% url 'reports:search' %}"> Search </a>
                     </li>
-
-   </div>
+                    <li role="presentation">
+                        <a href="{% url 'mails:inbox' %}"> Site Mail </a>
+                    </li>
+                </ul>
+            </div>
 </form>
 
                     {% block extralinks %}{% endblock %}

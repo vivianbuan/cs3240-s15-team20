@@ -4,7 +4,6 @@
 
 {% block content_title %}
   <h2>{{ folder.file_name }}</h2>
-  <h3 align="left"> <a href="{% url 'reports:add_report' %}" class = "btn btn-primary"> Add Report</a></h3>
   <h3 align="left"> <a href="{% url 'accounts:edit_folder' folder.pk %}" class = "btn btn-primary"> Edit Folder</a></h3>
 {% endblock %}
 

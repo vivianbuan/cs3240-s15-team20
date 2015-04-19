@@ -13,18 +13,18 @@ class UserProfile(models.Model):
     administrator = models.BooleanField(default=0)
     suspended = models.BooleanField(default=0)
 
-    @property    
+    @property
     def is_admin(self):
         return bool(self.administrator)
 
-    def make_admin(self,admin):
+    def make_admin(self, admin):
         self.administrator = admin
 
-    @property    
+    @property
     def date_joined(self):
         return self.user.date_joined
 
-    @property    
+    @property
     def is_suspended(self):
         return bool(self.suspended)
 
