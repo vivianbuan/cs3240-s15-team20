@@ -46,6 +46,13 @@ class MainParser(HTMLParser):
 			if self.printing:
 				print(c, end="")
 
+class AuthParser(HTMLParser):
+	authenticated = False
+
+	def handle_starttag(self, tag, attrs):
+		if tag == "div" and ('id','Reports') in attrs:
+			self.authenticated = True
+
 
 """class MainParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
