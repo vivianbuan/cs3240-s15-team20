@@ -13,7 +13,10 @@
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
-{% block extrastyle %}{% endblock %}
+{% block extrastyle %}
+<!-- Extra Cutom Stylesheet -->
+<!--<link rel="stylesheet" type="text/css" href="{% static 'styles/css/ExtraStyle.css'%}">-->
+{% endblock %}
 
 
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" />{% endif %}
@@ -27,16 +30,44 @@
 </head>
 {% load i18n %}
 
-<body class="{% block bodyclass %}{% endblock %}">
+<body class="{% block bodyclass %}{% endblock %}" style="padding-top:60px">
 
-<!-- Container -->
-<div class="container-fluid">
+{% block navbar %}
+<nav class="navbar navbar-inverse navbar-fixed-top" id="navbar">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">{% block branding %}<strong>SecureWitness</strong>{% endblock %}</a>
+        </div>
 
-    <!-- Header -->
-    <div class="row" id="header">
-        
-        <div class="col-md-12" id="user-tools">
-            <p class="text-right">
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav ">
+                <li role="presentation" class="{% block HomeActiveClass %}{% endblock %}">
+                    <a href="{% url 'home' %}">{% trans 'Home' %}</a>
+                </li>
+                <li role="presentation">
+                    <a href="{% url 'reports:add_report' %}"> Add Report</a>
+                </li>
+                <li role="presentation">
+                    <a href="{% url 'accounts:add_folder' %}"> Add Folder</a>
+                </li>
+                <li role="presentation">
+                    <a href="{% url 'accounts:add_group' %}"> Add Group</a>
+                </li>
+                 <li role="presentation">
+                    <a href="{% url 'reports:search' %}"> Search </a>
+                </li>
+                <li role="presentation">
+                    <a href="{% url 'mails:inbox' %}"> Site Mail </a>
+                </li>
+            </ul>
+            <p class="navbar-text navbar-right">
                 {% if user.is_active %}
                     {% block welcome-msg %}
                         {% trans 'Welcome,' %}
@@ -61,80 +92,31 @@
                 {% endif %}
             </p>
         </div>
-        {% block nav-global %}{% endblock %}
     </div>
-    <!-- END Header -->
-    {% block navbar %}
-    <nav class="navbar navbar-inverse" id="navbar">
-        <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="#">{% block branding %}<strong>SecureWitness</strong>{% endblock %}</a>
-            </div>
+</nav>
+{% endblock %}
 
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li role="presentation" class="{% block HomeActiveClass %}{% endblock %}">
-                        <a href="{% url 'home' %}">{% trans 'Home' %}</a>
-                    </li>
-                    <li role="presentation">
-                        <a href="{% url 'reports:add_report' %}"> Add Report</a>
-                    </li>
-                    <li role="presentation">
-                        <a href="{% url 'accounts:add_folder' %}"> Add Folder</a>
-                    </li>
-                    <li role="presentation">
-                        <a href="{% url 'accounts:add_group' %}"> Add Group</a>
-                    </li>
-                     <li role="presentation">
-                        <a href="{% url 'reports:search' %}"> Search </a>
-                    </li>
-                    <li role="presentation">
-                        <a href="{% url 'mails:inbox' %}"> Site Mail </a>
-                    </li>
-                </ul>
-            </div>
-</form>
+{% block messages %}
+    {% if messages %}
+    <ul class="messagelist">{% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+    {% endfor %}</ul>
+    {% endif %}
+{% endblock messages %}
 
-                    {% block extralinks %}{% endblock %}
-                </ul>
-            </div>
-
-
-
-        </div>
-    </nav>
+<!-- Content -->
+<div id="contentrow" class="jumbotron">
+    {% block pretitle %}{% endblock %}
+    {% block content_title %}{% endblock %}
+    <hr />
+    {% block content %}
     {% endblock %}
-
-    {% block messages %}
-        {% if messages %}
-        <ul class="messagelist">{% for message in messages %}
-          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
-        {% endfor %}</ul>
-        {% endif %}
-    {% endblock messages %}
-
-    <!-- Content -->
-    <div id="contentrow" class="jumbotron">
-        {% block pretitle %}{% endblock %}
-        {% block content_title %}{% endblock %}
-        <hr />
-        {% block content %}
-        {% endblock %}
-        {% block sidebar %}{% endblock %}
-        <br class="clear" />
-    </div>
-    <!-- END Content -->
-
-    {% block footer %}<div id="footer"></div>{% endblock %}
+    {% block sidebar %}{% endblock %}
+    <br class="clear" />
 </div>
-<!-- END Container -->
+<!-- END Content -->
+
+{% block footer %}<div id="footer"></div>{% endblock %}
 
 </body>
 </html>
