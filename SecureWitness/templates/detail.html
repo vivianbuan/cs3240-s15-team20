@@ -19,12 +19,20 @@
 			Keywords: {{ report.keywords }} <br/>
 			Private: {{ report.private }} <br />
 			Attachments:
-			{% if documents %}
+			{% if documents and not report.encrypt %}
 			{% for document in documents %}
 				<a href="{{ document.docfile.url }}"> {{ document.docfile.name }} </a>
 			{% endfor %}
-			{% else %}
-				None
+			{% elif documents and report.encrypt %}
+				There 
+				{% if documents|length == 1 %} is
+				{% else %} are 
+				{% endif %} {{ documents|length }} encrypted 
+				{% if documents|length == 1 %} file
+				{% else %} files
+				{% endif %}  attached to this report.
+			{% else %} 
+				None	
 			{% endif %}
 		</div>
 	</div>

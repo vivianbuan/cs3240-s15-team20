@@ -21,6 +21,7 @@ class reports(models.Model):
     timestamp = models.DateTimeField(auto_now_add = True)
     keywords = models.CharField(max_length=100, null=True)
     private = models.BooleanField(default = False)
+    encrypt = models.BooleanField(default = False) 
     folder = models.ForeignKey(Folder, related_name='reports_set', null=True, default=None)
 
     def __str__(self) :

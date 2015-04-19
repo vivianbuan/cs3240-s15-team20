@@ -47,6 +47,11 @@ Edit Report | SecureWitness
 				<input type="checkbox" name="{{ document.docfile.name }}"> {{ document.docfile.name }} </input> <br />
 			{% endfor %}
 		{% endif %}
+		{% if report.encrypt %} 
+			<input type="checkbox" name="encrypt" checked> Encrypt uploaded files </input> 
+		{% else %} 
+			<input type="checkbox" name="encrypt"> Encrypt uploaded files </input> 
+		{% endif %} 
 	</div>
     <div class="form-group">
 		<label for="name">Parent Folder</label>
@@ -61,9 +66,9 @@ Edit Report | SecureWitness
 	<div class="form-group">
 		<label for="name">Private/Public</label> <br/>
 		{% if report.private %} 
-			<input type="checkbox" name="private" checked> Check if private</input>
+			<input type="checkbox" name="private" checked> Make report private</input>
 		{% else %} 
-			<input type="checkbox" name="private"></input> 
+			<input type="checkbox" name="private"> Make report private </input> 
 		{% endif %}
 	</div>
 	<div class="form-actions">

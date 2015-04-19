@@ -77,6 +77,7 @@ def edit(request, pk):
         if d == "":
             d = None
         priv = request.POST.get("private", False)
+	enc = request.POST.get("encrypt", False) 
 
         if rep.author == auth:
             # Update the changes
@@ -89,6 +90,10 @@ def edit(request, pk):
                 rep.private = True
             else:
                 rep.private = priv
+	    if enc == "on": 
+		rep.encrypt = True
+	    else: 
+		rep.encrypt = enc
             rep.folder = parent
             # Save the changes
             rep.save()
@@ -131,12 +136,13 @@ def add_report(request):
             d = None
         keys = request.POST.get("keywords")
         priv = request.POST.get("private", False)
+	enc = request.POST.get("encrypt", False)
 
         name_line = request.POST.get("parent_folder").split("/")
         parent_id = name_line[1]
         parent = profile.folder_set.get(pk=parent_id)
 
-        rep = reports(author=auth, short=sh, details=det, location=loc, date=d, keywords=keys, private=priv)
+        rep = reports(author=auth, short=sh, details=det, location=loc, date=d, keywords=keys, encrypt=enc, private=priv)
         rep.folder = parent
         rep.save()
         # Save Files associated to the report
