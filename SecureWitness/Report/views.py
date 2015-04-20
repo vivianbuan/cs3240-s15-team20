@@ -33,27 +33,40 @@ def detail(request, pk):
         if request.user.is_active:
             profile = UserProfile.objects.filter(user=request.user)[0]
         else:
-            profile = None
+            error_type = 1
+            return render(request, 'error_page.html', {'t': error_type})
 
         if profile.user.username == rep.author:
             return render(request, 'detail.html', {'report': rep, 'documents': doc})
         else:
-            return render(request, 'error_page.html')
+            error_type = 1
+            return render(request, 'error_page.html', {'t': error_type})
     else:
         return render(request, 'detail.html', {'report': rep, 'documents': doc})
 
 
+@login_required(login_url="/accounts/login/")
 def delete(request, pk):
     if request.method == 'POST':
         rep = reports.objects.all().filter(pk=pk)[0]
         doc = Document.objects.all().filter(report=rep)
 
-        rep.delete()
-        for docs in doc:
-            docs.delete()
+        if request.user.is_active:
+            profile = UserProfile.objects.filter(user=request.user)[0]
+        else:
+            error_type = 2
+            return render(request, 'error_page.html', {'t': error_type})
 
+        if profile.user.username == rep.author:
+            rep.delete()
+            for docs in doc:
+                docs.delete()
+        else:
+            error_type = 2
+            return render(request, 'error_page.html', {'t': error_type})
     entries = reports.objects.all().filter(private=False)[:20]
     return render(request, 'index.html', {'report': entries})
+
 
 @login_required(login_url="/accounts/login/")
 def edit(request, pk):
