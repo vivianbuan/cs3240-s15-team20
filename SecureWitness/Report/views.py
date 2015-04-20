@@ -29,29 +29,44 @@ def detail(request, pk):
     rep = reports.objects.all().filter(pk=pk)[0]
     doc = Document.objects.all().filter(report=rep)
 
-    # if request.user.is_active:
-    #     profile = UserProfile.objects.filter(user=request.user)[0]
-    # else:
-    #     profile = None
-    # folders = profile.folder_set.all()[:20]
-    #
-    # if request.POST.get("edit"):
-    #     return render(request, 'edit.html', {'report': rep, 'documents': doc, 'folder': folders})
+    if rep.private:
+        if request.user.is_active:
+            profile = UserProfile.objects.filter(user=request.user)[0]
+        else:
+            error_type = 1
+            return render(request, 'error_page.html', {'t': error_type})
 
-    return render(request, 'detail.html', {'report': rep, 'documents': doc})
+        if profile.user.username == rep.author:
+            return render(request, 'detail.html', {'report': rep, 'documents': doc})
+        else:
+            error_type = 1
+            return render(request, 'error_page.html', {'t': error_type})
+    else:
+        return render(request, 'detail.html', {'report': rep, 'documents': doc})
 
 
+@login_required(login_url="/accounts/login/")
 def delete(request, pk):
     if request.method == 'POST':
         rep = reports.objects.all().filter(pk=pk)[0]
         doc = Document.objects.all().filter(report=rep)
 
-        rep.delete()
-        for docs in doc:
-            docs.delete()
+        if request.user.is_active:
+            profile = UserProfile.objects.filter(user=request.user)[0]
+        else:
+            error_type = 2
+            return render(request, 'error_page.html', {'t': error_type})
 
+        if profile.user.username == rep.author:
+            rep.delete()
+            for docs in doc:
+                docs.delete()
+        else:
+            error_type = 2
+            return render(request, 'error_page.html', {'t': error_type})
     entries = reports.objects.all().filter(private=False)[:20]
     return render(request, 'index.html', {'report': entries})
+
 
 @login_required(login_url="/accounts/login/")
 def edit(request, pk):
@@ -62,29 +77,35 @@ def edit(request, pk):
     if request.user.is_active:
         profile = UserProfile.objects.filter(user=request.user)[0]
     else:
-        profile = None
-    folders = profile.folder_set.all()[:20]
+        error_type = 2
+        return render(request, 'error_page.html', {'t': error_type})
 
-    if request.method == 'POST' and request.POST.get("click"):
-        # Get possible changes from the form
-        auth = request.POST.get("author")
-        sh = request.POST.get("short")
-        det = request.POST.get("details")
-        loc = request.POST.get("location")
-        keys = request.POST.get("keywords")
-        d = request.POST.get("date")
-        name_line = request.POST.get("parent_folder").split("/")
-        parent_id = name_line[1]
-        # message = 0
-        parent = profile.folder_set.get(pk=parent_id)
-        # message = request.POST.get("click")
-        if d == "":
-            d = None
-        priv = request.POST.get("private", False)
-        enc = request.POST.get("encrypt", False) 
+    if profile.user.username != rep.author:
+            error_type = 2
+            return render(request, 'error_page.html', {'t': error_type})
+    else:
+        folders = profile.folder_set.all()[:20]
 
-        if rep.author == auth:
-            # Update the changes
+        if request.method == 'POST' and request.POST.get("click"):
+            # Get possible changes from the form
+            auth = request.POST.get("author")
+            sh = request.POST.get("short")
+            det = request.POST.get("details")
+            loc = request.POST.get("location")
+            keys = request.POST.get("keywords")
+            d = request.POST.get("date")
+            name_line = request.POST.get("parent_folder").split("/")
+            parent_id = name_line[1]
+            # message = 0
+            parent = profile.folder_set.get(pk=parent_id)
+            # message = request.POST.get("click")
+            if d == "":
+                d = None
+            priv = request.POST.get("private", False)
+            enc = request.POST.get("encrypt", False)
+
+            # if rep.author == auth:
+                # Update the changes
             rep.short = sh
             rep.details = det
             rep.location = loc
@@ -94,29 +115,29 @@ def edit(request, pk):
                 rep.private = True
             else:
                 rep.private = priv
-        if enc == "on": 
-            rep.encrypt = True
-        else: 
-            rep.encrypt = enc
-            rep.folder = parent
-            # Save the changes
-            rep.save()
+            if enc == "on":
+                rep.encrypt = True
+            else:
+                rep.encrypt = enc
+                rep.folder = parent
+                # Save the changes
+                rep.save()
 
-            # Make changes to existing files
-            for d in doc:
-                check = request.POST.get(d.docfile.name, False)
-                if check or check == "on":
-                    d.delete()
+                # Make changes to existing files
+                for d in doc:
+                    check = request.POST.get(d.docfile.name, False)
+                    if check or check == "on":
+                        d.delete()
 
-            # Upload any new files
-            files = request.FILES.getlist('files[]')
-            for f in files:
-                document = Document(docfile=f, report=rep)
-                document.save()
+                # Upload any new files
+                files = request.FILES.getlist('files[]')
+                for f in files:
+                    document = Document(docfile=f, report=rep)
+                    document.save()
 
-            doc = Document.objects.all().filter(report=rep)
-            # return render(request, 'edit.html', {'report': rep, 'documents': doc, 'folder': folders, 'error': message})
-            return render(request, 'detail.html', {'report': rep, 'documents': doc})
+                doc = Document.objects.all().filter(report=rep)
+                # return render(request, 'edit.html', {'report': rep, 'documents': doc, 'folder': folders, 'error': message})
+                return render(request, 'detail.html', {'report': rep, 'documents': doc})
 
     # message = request.POST.get("click")
     return render(request, 'edit.html', {'report': rep, 'documents': doc, 'folder': folders})
