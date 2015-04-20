@@ -47,9 +47,10 @@ def auth(url,username, password):
 
 if __name__=="__main__":
 	while True:
+		url = input("Site URL: ")
 		username = input("Username: ")
 		pswd = getpass.getpass('Password:')
-		if auth("http://127.0.0.1:8000/accounts/login/",username,pswd):
+		if auth(url + "/accounts/login/",username,pswd):
 			loggedIn = True
 			break
 		while True:
@@ -73,7 +74,7 @@ if __name__=="__main__":
 			print("\tlist: list all reports accessible to you")
 			print("\tquit: exit this program")
 		elif command == "list":
-			listreports("http://127.0.0.1:8000/accounts/login/",username,pswd)
+			listreports(url+"/accounts/login/",username,pswd)
 		elif command == "quit":
 			break
 		else:

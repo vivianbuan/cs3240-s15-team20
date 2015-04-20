@@ -174,7 +174,10 @@ def add_report(request):
         files = request.FILES.getlist('files[]')
         if enc: 
             key = os.urandom(16)  #  Generate Key
-            enckey = str(key)
+            #enckey = key.decode('utf-16')
+            enckey=""
+            for byte in key:
+                enckey = enckey + str(byte) + 'x'
             for f in files:
                 filename = f.name + ".enc"
             with open(str(filename), 'wb') as out_file: 

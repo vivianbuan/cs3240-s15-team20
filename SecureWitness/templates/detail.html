@@ -9,7 +9,7 @@
 {% block content %}
 	<h5>Posted on {{ report.timestamp }} by {{ report.author}}</h5>
 	<div class="panel panel-default">
-		<div class=panel-body>
+		<div class="panel-body">
 			<h4>Long Description:</h4> 
 			<h5> 
 				{{ report.details }}
@@ -19,21 +19,22 @@
 			<h4>Keywords: <span class="h5">{{ report.keywords }}</span></h4>
 			<h4>Private: <span class="h5">{{ report.private }}</span></h4>
 			<h4>Attachments:
-			{% if documents and not report.encrypt %}
-			</h4>
-			<ul>
-			{% for document in documents %}
-				<li><a href="{{ document.docfile.url }}"> {{ document.docfile.name }} </a></li>
-			{% endfor %}
-			</ul>
-			{% elif documents and report.encrypt %}
-				<span class="h5">There 
-				{% if documents|length == 1 %} is
-				{% else %} are 
-				{% endif %} {{ documents|length }} encrypted 
-				{% if documents|length == 1 %} file
-				{% else %} files
-				{% endif %}  attached to this report.</span></h4>
+			{% if documents %}
+				{% if report.encrypt%}
+					<span class="h5">There 
+					{% if documents|length == 1 %} is
+					{% else %} are 
+					{% endif %} {{ documents|length }} encrypted 
+					{% if documents|length == 1 %} file
+					{% else %} files
+					{% endif %}  attached to this report.</span>
+				{% endif %}
+				</h4>
+				<ul {% if report.encrypt %}class="hide"{% endif %}>
+				{% for document in documents %}
+					<li><a href="{{ document.docfile.url }}"> {{ document.docfile.name }} </a></li>
+				{% endfor %}
+				</ul>
 			{% else %} 
 				<span class="h5">None</span></h4>	
 			{% endif %}
