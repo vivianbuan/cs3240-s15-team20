@@ -29,16 +29,18 @@ def detail(request, pk):
     rep = reports.objects.all().filter(pk=pk)[0]
     doc = Document.objects.all().filter(report=rep)
 
-    # if request.user.is_active:
-    #     profile = UserProfile.objects.filter(user=request.user)[0]
-    # else:
-    #     profile = None
-    # folders = profile.folder_set.all()[:20]
-    #
-    # if request.POST.get("edit"):
-    #     return render(request, 'edit.html', {'report': rep, 'documents': doc, 'folder': folders})
+    if rep.private:
+        if request.user.is_active:
+            profile = UserProfile.objects.filter(user=request.user)[0]
+        else:
+            profile = None
 
-    return render(request, 'detail.html', {'report': rep, 'documents': doc})
+        if profile.user.username == rep.author:
+            return render(request, 'detail.html', {'report': rep, 'documents': doc})
+        else:
+            return render(request, 'error_page.html')
+    else:
+        return render(request, 'detail.html', {'report': rep, 'documents': doc})
 
 
 def delete(request, pk):
