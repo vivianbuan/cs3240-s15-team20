@@ -62,31 +62,37 @@ def login(request, template_name='registration/login.html',
                                    request.GET.get(redirect_field_name, ''))
 
     if request.method == "POST":
-        form = authentication_form(request, data=request.POST)
-        if form.is_valid():
-            # Ensure the user-originating redirection url is safe.
-            if not is_safe_url(url=redirect_to, host=request.get_host()):
-                redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+        if request.POST.get("login"):
+            form = authentication_form(request, data=request.POST)
+            if form.is_valid():
+                # Ensure the user-originating redirection url is safe.
+                if not is_safe_url(url=redirect_to, host=request.get_host()):
+                    redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
 
-            # Okay, security check complete. Log the user in.
-            profile = UserProfile.objects.filter(user=form.get_user())
-            if len(profile) is 0:
-                context = {
-                    'form': form,
-                    redirect_field_name: redirect_to,
-                }
-                if extra_context is not None:
-                    context.update(extra_context)
-                return TemplateResponse(request, template_name, context,
+                # Okay, security check complete. Log the user in.
+                profile = UserProfile.objects.filter(user=form.get_user())
+                if len(profile) is 0:
+                    context = {
+                        'form': form,
+                        redirect_field_name: redirect_to,
+                    }
+                    if extra_context is not None:
+                        context.update(extra_context)
+                    return TemplateResponse(request, template_name, context,
                                         current_app=current_app)
 
-            profile = profile[0]
-            if profile.is_suspended:
-                return render(request, 'registration/suspended.html')
+                profile = profile[0]
+                if profile.is_suspended:
+                    return render(request, 'registration/suspended.html')
 
-            auth_login(request, form.get_user())
+                auth_login(request, form.get_user())
 
-            return HttpResponseRedirect(redirect_to)
+                return HttpResponseRedirect(redirect_to)
+        elif request.POST.get("forgetP"):
+            return render(request, 'registration/password_reset_form.html')
+        else:
+            error_type = 4
+            return render(request, 'error_page.html', {'t': error_type})
 
     form = authentication_form(request)
 
@@ -187,7 +193,7 @@ def edit_folder(request, folder_id):
         current_folder = profile.folder_set.filter(pk=folder_id)[0]
         folders = profile.folder_set.all()[:20]
 
-        if request.method == 'POST' and request.POST.get("click"):
+        if request.method == 'POST':
             # handle different request
             if request.POST.get("cancel"):  # Cancel
                 return render(request, 'report_list.html', {'folder': current_folder})
