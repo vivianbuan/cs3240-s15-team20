@@ -1,6 +1,7 @@
 from django.conf import settings
 
 from django.shortcuts import render, HttpResponseRedirect
+from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, resolve_url
 
 from django.views.decorators.debug import sensitive_post_parameters
@@ -170,7 +171,8 @@ def add_folder(request):
                 folder.save()
 
         root_folder = profile.folder_set.filter(file_name="DEFAULT FOLDER")[0]
-        return render(request, 'user_profile.html', {'o': root_folder, 'prof': profile})
+
+        return HttpResponseRedirect(reverse('accounts:profile'))
 
     folders = profile.folder_set.all()[:20]
     error = ""
@@ -185,7 +187,6 @@ def edit_folder(request, folder_id):
         error_type = 3
         return render(request, 'error_page.html', {'t': error_type})
 
-    # current_folder = profile.folder_set.filter(pk=folder_id)[0]
     if len(profile.folder_set.filter(pk=folder_id)) == 0:
         error_type = 3
         return render(request, 'error_page.html', {'t': error_type})
@@ -196,14 +197,12 @@ def edit_folder(request, folder_id):
         if request.method == 'POST':
             # handle different request
             if request.POST.get("cancel"):  # Cancel
-                return render(request, 'report_list.html', {'folder': current_folder})
+                return HttpResponseRedirect(reverse('accounts:report_list', args=[folder_id]))
             elif request.POST.get("save"):  # Save changes
                 title = request.POST.get("file_name")
                 name_line = request.POST.get("parent_folder").split("/")
                 parent_id = name_line[1]
                 parent = profile.folder_set.get(pk=parent_id)
-                # parent_name = request.POST.get("parent_folder")
-                # parent = Folder.objects.get(file_name=parent_name)
                 if parent.parent_folder == current_folder:
                     error = "Error: Your target folder " + parent.file_name + "is  currently in " + current_folder.file_name
                     return render(request, 'edit_folder.html',
@@ -215,7 +214,7 @@ def edit_folder(request, folder_id):
                 elif len(title) == 0:
                     current_folder.parent_folder = parent
                     current_folder.save()
-                    return render(request, 'report_list.html', {'folder': current_folder})
+                    return HttpResponseRedirect(reverse('accounts:report_list', args=[folder_id]))
                 elif parent.parents.filter(file_name=title).count() != 0:
                     error = "Error: Folder " + title + " already exist in the target folder " + parent.file_name
                     return render(request, 'edit_folder.html',
@@ -224,11 +223,11 @@ def edit_folder(request, folder_id):
                     current_folder.file_name = title
                     current_folder.parent_folder = parent
                     current_folder.save()
-                    return render(request, 'report_list.html', {'folder': current_folder})
+                    return HttpResponseRedirect(reverse('accounts:report_list', args=[folder_id]))
             elif request.POST.get("delete"):  # Delete folder
                 get_object_or_404(Folder, pk=folder_id).delete()
                 root_folder = profile.folder_set.filter(file_name="DEFAULT FOLDER")[0]
-                return render(request, 'user_profile.html', {'o': root_folder, 'prof': profile})
+                return HttpResponseRedirect(reverse('accounts:profile'))
             else:  # only for debug issue
                 error = "Error: button not working!"
                 return render(request, 'edit_folder.html', {'current': current_folder, 'folder': folders, 'message': error})
