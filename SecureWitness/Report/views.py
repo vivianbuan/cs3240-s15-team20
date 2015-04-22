@@ -64,9 +64,7 @@ def delete(request, pk):
         else:
             error_type = 2
             return render(request, 'error_page.html', {'t': error_type})
-    entries = reports.objects.all().filter(private=False)
-    return render(request, 'index.html', {'report': entries})
-
+    return HttpResponseRedirect(reverse('home'))
 
 @login_required(login_url="/accounts/login/")
 def edit(request, pk):
@@ -137,7 +135,8 @@ def edit(request, pk):
 
                 doc = Document.objects.all().filter(report=rep)
                 # return render(request, 'edit.html', {'report': rep, 'documents': doc, 'folder': folders, 'error': message})
-                return render(request, 'detail.html', {'report': rep, 'documents': doc})
+                return HttpResponseRedirect(reverse('reports:detail', args=[pk]))
+                # return render(request, 'detail.html', {'report': rep, 'documents': doc})
 
     # message = request.POST.get("click")
     return render(request, 'edit.html', {'report': rep, 'documents': doc, 'folder': folders})
@@ -200,10 +199,11 @@ def add_report(request):
         else: 
             for f in files: 
                 doc = Document(docfile=f, report=rep)
-                doc.save() 
+                doc.save()
 
-            entries = reports.objects.all().filter(private=False)
-            return render(request, 'index.html', {'report': entries})
+            # entries = reports.objects.all().filter(private=False)
+            return HttpResponseRedirect(reverse('home'))
+            # return render(request, 'index.html', {'report': entries})
         
 
     entries = reports.objects.all()
