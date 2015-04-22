@@ -17,7 +17,12 @@ from Report.models import reports
 from accounts.forms import GroupCreationForm, UserGroupCreationForm, GroupAdditionForm
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
+from django.core.mail import send_mail
+import hashlib,datetime, random
+from django.utils import timezone
 from django.contrib.auth import (REDIRECT_FIELD_NAME, login as auth_login,
                                  logout as auth_logout, get_user_model, update_session_auth_hash)
 
@@ -34,25 +39,64 @@ def register(request, creation_form=UserCreationForm, extra_context=None):
     if request.method == "POST":
         # Add User Model instance here
         if form.is_valid():
+            # create the user
             user = form.save()
+            # user.is_active = False
+            email = request.POST.get("email")
+            user.email = email
             profile = UserProfile(user=user)
+            username = form.cleaned_data['username']
+            random_string = str(random.random()).encode('utf8')
+            salt = hashlib.sha1(random_string).hexdigest()[:5]
+            salted = (salt + email).encode('utf8')
+            activation_key = hashlib.sha1(salted).hexdigest()
+            key_expires = datetime.datetime.today() + datetime.timedelta(2)
+            profile.activation_key = activation_key
+            profile.key_expires = key_expires
+            # profile.suspended = True
             profile.save()
-            user = authenticate(username=form.cleaned_data.get("username"),
-                                password=form.cleaned_data.get("password1"))
-            login(request, user)
-            return HttpResponseRedirect("/")
+
+            # Send email with activation key
+            email_subject = 'Account confirmation'
+            email_body = "Hey %s, thanks for signing up. To activate your account, click this link within" \
+                         "48hours http://127.0.0.1:8000/accounts/confirm/%s" % (username, activation_key)
+
+            send_mail(email_subject, email_body, 'viviancaas@gmail.com', [email], fail_silently=False)
+
+            return render(request, "myregistration/register_success.html")
+            # user = authenticate(username=form.cleaned_data.get("username"),
+            #                     password=form.cleaned_data.get("password1"))
+            # login(request, user)
+            # return HttpResponseRedirect("/")
     context = {
     'form': form,
     }
     if extra_context is not None:
         context.update(extra_context)
-    return render(request, "registration/register.html", context)
+    return render(request, "myregistration/register.html", context)
+
+
+def register_confirm(request, activation_key):
+    # if user already logged in, redirect to some other url
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('home'))
+
+    profile = get_object_or_404(UserProfile, activation_key=activation_key)
+
+    if profile.key_expires < timezone.now():
+        return render(request, "myregistration/confirm_expired.html")
+    else:
+        # user = profile.user
+        # user.is_active = True
+        profile.suspended = False
+        profile.save()
+        return render(request, "myregistration/confirm.html")
 
 
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
-def login(request, template_name='registration/login.html',
+def login(request, template_name='myregistration/login.html',
           redirect_field_name=REDIRECT_FIELD_NAME,
           authentication_form=AuthenticationForm,
           current_app=None, extra_context=None):
@@ -72,6 +116,7 @@ def login(request, template_name='registration/login.html',
 
                 # Okay, security check complete. Log the user in.
                 profile = UserProfile.objects.filter(user=form.get_user())
+
                 if len(profile) is 0:
                     context = {
                         'form': form,
@@ -80,17 +125,19 @@ def login(request, template_name='registration/login.html',
                     if extra_context is not None:
                         context.update(extra_context)
                     return TemplateResponse(request, template_name, context,
-                                        current_app=current_app)
 
+                                        current_app=current_app)
                 profile = profile[0]
                 if profile.is_suspended:
-                    return render(request, 'registration/suspended.html')
+                    error_type = 5
+                    return render(request, 'error_page.html', {'t': error_type})
+                    # return render(request, 'myregistration/suspended.html')
 
                 auth_login(request, form.get_user())
 
                 return HttpResponseRedirect(redirect_to)
-        elif request.POST.get("forgetP"):
-            return render(request, 'registration/password_reset_form.html')
+        # elif request.POST.get("forgetP"):
+        #     return HttpResponseRedirect(reverse('accounts:retrieve_password'))
         else:
             error_type = 4
             return render(request, 'error_page.html', {'t': error_type})
@@ -106,6 +153,29 @@ def login(request, template_name='registration/login.html',
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
 
+
+# def retrieve_password(request):
+#     if request.method == "POST":
+#         if request.POST.get("cancel"):
+#             return HttpResponseRedirect(reverse('accounts:login'))
+#         elif request.POST.get("resetP"):
+#             request_name = request.POST.get("username")
+#             email_address = request.POST.get("email")
+#             user_filter = UserProfile.objects.filter(user__username=request_name)
+#             if len(user_filter) == 0:
+#                 error = "This username does not exist!"
+#                 return render(request, 'myregistration/password_reset_form.html', {'message': error})
+#             else:
+#                 profile = user_filter[0]
+#                 if profile.user.email == email_address:
+#
+#                 else:
+#                     error = "The email address you entered is not compatible with the username!"
+#                     return render(request, 'myregistration/password_reset_form.html', {'message': error})
+#         else:
+#             error_type = 4
+#             return render(request, 'error_page.html', {'t': error_type})
+#     return render(request, 'myregistration/password_reset_form.html')
 
 @login_required(login_url="/accounts/login/")
 def profile(request):

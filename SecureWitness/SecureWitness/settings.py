@@ -93,6 +93,14 @@ STATICFILES_DIRS = (
 
 STATIC_URL = '/static/'
 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'viviancaas@gmail.com'
+EMAIL_HOST_PASSWORD = 'Zhui-XIN-Zu'
+DEFAULT_FROM_EMAIL = 'viviancaas@gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
 )
