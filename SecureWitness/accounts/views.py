@@ -39,11 +39,15 @@ def register(request, creation_form=UserCreationForm, extra_context=None):
     if request.method == "POST":
         # Add User Model instance here
         if form.is_valid():
+            if not request.POST.get("email"):
+                error = "The email field is required!"
+                return render(request, "myregistration/register.html", {'message': error})
             # create the user
             user = form.save()
             # user.is_active = False
             email = request.POST.get("email")
             user.email = email
+            user.save()
             profile = UserProfile(user=user)
             username = form.cleaned_data['username']
             random_string = str(random.random()).encode('utf8')
@@ -53,7 +57,6 @@ def register(request, creation_form=UserCreationForm, extra_context=None):
             key_expires = datetime.datetime.today() + datetime.timedelta(2)
             profile.activation_key = activation_key
             profile.key_expires = key_expires
-            # profile.suspended = True
             profile.save()
 
             # Send email with activation key
@@ -84,6 +87,22 @@ def register_confirm(request, activation_key):
     profile = get_object_or_404(UserProfile, activation_key=activation_key)
 
     if profile.key_expires < timezone.now():
+        email = profile.user.email
+        # email = "viviancaas@gmail.com"
+        username = profile.user.username
+        random_string = str(random.random()).encode('utf8')
+        salt = hashlib.sha1(random_string).hexdigest()[:5]
+        salted = (salt + email).encode('utf8')
+        activation_key = hashlib.sha1(salted).hexdigest()
+        key_expires = datetime.datetime.today() + datetime.timedelta(2)
+        profile.activation_key = activation_key
+        profile.key_expires = key_expires
+        profile.save()
+        email_subject = 'Account confirmation'
+        email_body = "Hey %s, thanks for signing up. To activate your account, click this link within" \
+                         "48hours http://127.0.0.1:8000/accounts/confirm/%s" % (username, activation_key)
+
+        send_mail(email_subject, email_body, 'viviancaas@gmail.com', [email], fail_silently=False)
         return render(request, "myregistration/confirm_expired.html")
     else:
         # user = profile.user
