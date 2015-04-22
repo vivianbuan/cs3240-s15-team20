@@ -64,10 +64,7 @@ def delete(request, pk):
         else:
             error_type = 2
             return render(request, 'error_page.html', {'t': error_type})
-    # entries = reports.objects.all().filter(private=False)[:20]
     return HttpResponseRedirect(reverse('home'))
-    # return render(request, 'index.html', {'report': entries})
-
 
 @login_required(login_url="/accounts/login/")
 def edit(request, pk):
@@ -85,7 +82,7 @@ def edit(request, pk):
             error_type = 2
             return render(request, 'error_page.html', {'t': error_type})
     else:
-        folders = profile.folder_set.all()[:20]
+        folders = profile.folder_set.all()
 
         if request.method == 'POST' and request.POST.get("click"):
             # Get possible changes from the form
@@ -209,8 +206,8 @@ def add_report(request):
             # return render(request, 'index.html', {'report': entries})
         
 
-    entries = reports.objects.all()[:20]
-    folders = profile.folder_set.all()[:20]
+    entries = reports.objects.all()
+    folders = profile.folder_set.all()
 
     return render(request, 'add_report.html', {'report': entries, 'folder': folders})
 
