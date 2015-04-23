@@ -32,7 +32,7 @@ def detail(request, pk):
     groups = rep.groups.all()
     users = [] 
     for g in groups: 
-	users += g.user_set.all()
+        users += g.user_set.all()
     pprint(users, sys.stderr)
     if rep.private:
         if request.user.is_active:
@@ -164,8 +164,8 @@ def add_report(request):
         if d == "":
             d = None
         keys = request.POST.get("keywords")
-	#pprint(request.POST, sys.stderr)
-	groups = request.POST.getlist('shared[]')
+        #pprint(request.POST, sys.stderr)
+        groups = request.POST.getlist('shared[]')
         priv = request.POST.get("private", False)
         enc = request.POST.get("encrypt", False)
 
@@ -177,15 +177,15 @@ def add_report(request):
         rep.folder = parent
         rep.save()
 
-	#pprint(groups, sys.stderr)
-	user = User.objects.get(username=request.user)
-	for g in groups: 
-	 #   pprint(g, sys.stderr) 
-	    group = user.groups.get(id=g) 
-	  #  pprint(group)
-	    rep.groups.add(group)		
+        #pprint(groups, sys.stderr)
+        user = User.objects.get(username=request.user)
+        for g in groups: 
+         #   pprint(g, sys.stderr) 
+            group = user.groups.get(id=g) 
+          #  pprint(group)
+            rep.groups.add(group)		
 
-	groups = rep.groups.all()
+        groups = rep.groups.all()
 
         # Save Files associated to the report
         files = request.FILES.getlist('files[]')
@@ -220,7 +220,7 @@ def add_report(request):
                 doc.save()
 
             # entries = reports.objects.all().filter(private=False)
-	    return HttpResponseRedirect(reverse('home'))
+            return HttpResponseRedirect(reverse('home'))
             # return render(request, 'index.html', {'report': entries})
         
     entries = reports.objects.all()
