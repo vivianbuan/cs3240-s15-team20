@@ -13,6 +13,7 @@
 
 {% block content %}
 <div class="list-group">
+	<h2> Reports and Folders </h2> 
         {% for f in o.parents.all %}
 		<a href="{% url 'accounts:report_list' f.pk %}" class="list-group-item">
 			<h3> {{ f.file_name }} </h3>
@@ -24,5 +25,17 @@
 			<h4> Posted on {{ r.timestamp }} by {{ r.author}}</h4>
 		</a>
 	    {%  endfor %}
+</div>
+<div class="list-group">
+	<h2> Groups </h2> 
+	{% if groups %} 
+		{% for g in groups %} 
+			<a href="{% url 'accounts:group_details' g.pk %}" class="list-group-item"> 
+				<h3>{{ g }}</h3>
+			</a>
+		{% endfor %} 		
+	{% else %} 
+		<h4> You are currently in no groups <h4> 
+	{% endif %} 
 </div>
 {% endblock %}

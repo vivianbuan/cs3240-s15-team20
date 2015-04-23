@@ -5,6 +5,7 @@ from accounts import views
 
 urlpatterns = patterns('',
                        url(r'^$', views.profile, name='home'),
+		       url(r'^group_details/(\d+)/$', views.group_details, name='group_details'),
                        url(r'^login/$', views.login, name='login'),
                        url(r'^logout/$', 'django.contrib.auth.views.logout', name='logout'),
                        url(r'^changepw/$', 'django.contrib.auth.views.password_change', name='password_change'),

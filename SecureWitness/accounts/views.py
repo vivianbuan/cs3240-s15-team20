@@ -29,6 +29,9 @@ from django.contrib.auth import (REDIRECT_FIELD_NAME, login as auth_login,
 from django.template.response import TemplateResponse
 from django.utils.http import is_safe_url
 
+from pprint import pprint 
+import sys
+
 # Create your views here.
 
 @sensitive_post_parameters()
@@ -100,7 +103,7 @@ def register_confirm(request, activation_key):
         profile.save()
         email_subject = 'Account confirmation'
         email_body = "Hey %s, thanks for signing up. To activate your account, click this link within" \
-                         "48hours http://127.0.0.1:8000/accounts/confirm/%s" % (username, activation_key)
+                         "48hours: http://127.0.0.1:8000/accounts/confirm/%s" % (username, activation_key)
 
         send_mail(email_subject, email_body, 'viviancaas@gmail.com', [email], fail_silently=False)
         return render(request, "myregistration/confirm_expired.html")
@@ -212,8 +215,16 @@ def profile(request):
         folder.save()
         # folders = Folder.objects.all()[:20]
 
+    group_list = []
+    groups = UserGroup.objects.all()
+#    pprint(groups, sys.stderr)   
+    for g in groups: 
+	users = g.user_set.all()
+	if profile.user in users: 
+		group_list.append(g)		
+
     root_folder = profile.folder_set.filter(file_name="DEFAULT FOLDER")[0]
-    return render(request, 'user_profile.html', {'o': root_folder, 'prof': profile})
+    return render(request, 'user_profile.html', {'o': root_folder, 'prof': profile, 'groups': group_list})
 
 
 @login_required(login_url="/accounts/login/")
@@ -474,11 +485,40 @@ def check_user_fail(request):
 
 
 @login_required(login_url="/accounts/login/")
-def add_group(request, creation_form=UserGroupCreationForm):
+def group_details(request, pk): 
+    usergroup = UserGroup.objects.filter(pk=pk)[0]
+    users = usergroup.user_set.all() 
+#    pprint(users, sys.stderr)
+ #   pprint(usergroup.group.name, sys.stderr) 
+    name = str(usergroup.group.name)
+    
+    return render(request, 'group_details.html', {'group': usergroup.group, 'group_name': name, 'users': users})
+
+@login_required(login_url="/accounts/login/")
+def add_group(request, creation_form=UserGroupCreationForm):  
     if request.method == "POST":
+	ug = UserGroup()
+	usernames = request.POST.get('username').split(",")
+	add = []
+	keep = None
+	if len(usernames) > 1: 
+		l = 0
+		for u in usernames:
+			if l == 0: 
+				l += 1
+				keep = u.strip()
+			else: 
+				add.append(u.strip())
+		request.POST['username'] = u.strip()
         form = creation_form(data=request.POST)
         if form.is_valid():
-            form.save()
+	    pprint(request.POST, sys.stderr)
+	    pprint(form, sys.stderr)
+	    form.save()
+#	    group = UserGroup.objects.filter(group=request.POST.get('groupname'))
+#	    for user in add: 
+#	    	group.user_set.add(user) 
+#	    pprint(form.id, sys.stderr) 
             return HttpResponseRedirect('/')
     else:
         form = creation_form(request)
