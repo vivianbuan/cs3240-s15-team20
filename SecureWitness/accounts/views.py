@@ -409,7 +409,7 @@ def admin_group(request, group_id):
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
-def admin_creategroup(request, creation_form=GroupCreationForm):
+def admin_creategroup(request, creation_form=UserGroupCreationForm):
     if check_user_fail(request):
         return render(request, 'admin/reject.html')
 
@@ -417,7 +417,7 @@ def admin_creategroup(request, creation_form=GroupCreationForm):
         form = creation_form(data=request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect("/accounts/admin")
+            return render(request, 'admin/action_complete.html')
     else:
         form = creation_form(request)
 
