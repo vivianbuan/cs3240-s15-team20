@@ -2,6 +2,7 @@ from django.db import models
 from accounts.models import UserProfile
 from Crypto.Cipher import AES
 from Crypto import Random
+from django.contrib.auth.models import Group
 import sys
 import time
 import pprint 
@@ -27,6 +28,7 @@ class reports(models.Model):
     private = models.BooleanField(default = False)
     encrypt = models.BooleanField(default = False) 
     folder = models.ForeignKey(Folder, related_name='reports_set', null=True, default=None)
+    groups = models.ManyToManyField(Group)
 
     def __str__(self) :
     	return self.short

@@ -17,6 +17,14 @@
 			<h4>Location:<span class="h5">{{ report.location }}</span></h4>
 			<h4>Date: <span class="h5">{{ report.date }}</span></h4>
 			<h4>Keywords: <span class="h5">{{ report.keywords }}</span></h4>
+			{% if groups|length > 0 %} 
+				<h4>Shared groups: </h4>
+				{% for  g in groups %} 
+					<span class="h5"> {{ g }} </h5> <br /> 
+				{% endfor %}
+			{% else %} 
+				<h4>Shared groups:<span class="h5"> None</span></h4>
+			{% endif %} 
 			<h4>Private: <span class="h5">{{ report.private }}</span></h4>
 			<h4>Attachments:
 			{% if documents %}

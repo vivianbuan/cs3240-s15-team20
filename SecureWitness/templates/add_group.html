@@ -16,7 +16,7 @@ Add Group | SecureWitness
       <input type="text" class="form-control" placeholder="Enter group name" name="groupname"></input>
    </div>
    <div class="form-group">
-      <input class="form-control" rows="10" placeholder="Eter the usernames of the users you would like to add to the groug (including yourself), separated by commas (,)" name="username"></input>
+      <input type="hidden" class="form-control" name="username" value="{{ user.username }}"></input>
    </div>
    <div class="form-actions">
         <button type="submit" class="btn btn-primary" style="float: right;"> Save </button>

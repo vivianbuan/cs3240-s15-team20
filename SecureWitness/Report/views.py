@@ -18,6 +18,7 @@ from Crypto.Cipher import AES
 from Crypto import Random
 import os
 from django.core.files import File
+from django.contrib.auth.models import User
 
 
 def home(request):
@@ -28,7 +29,11 @@ def home(request):
 def detail(request, pk):
     rep = reports.objects.all().filter(pk=pk)[0]
     doc = Document.objects.all().filter(report=rep)
-
+    groups = rep.groups.all()
+    users = [] 
+    for g in groups: 
+	users += g.user_set.all()
+    pprint(users, sys.stderr)
     if rep.private:
         if request.user.is_active:
             profile = UserProfile.objects.filter(user=request.user)[0]
@@ -36,13 +41,13 @@ def detail(request, pk):
             error_type = 1
             return render(request, 'error_page.html', {'t': error_type})
 
-        if profile.user.username == rep.author:
-            return render(request, 'detail.html', {'report': rep, 'documents': doc})
+        if profile.user in users:
+            return render(request, 'detail.html', {'report': rep, 'documents': doc, 'groups': groups})
         else:
             error_type = 1
             return render(request, 'error_page.html', {'t': error_type})
     else:
-        return render(request, 'detail.html', {'report': rep, 'documents': doc})
+        return render(request, 'detail.html', {'report': rep, 'documents': doc, 'groups': groups})
 
 
 @login_required(login_url="/accounts/login/")
@@ -159,6 +164,8 @@ def add_report(request):
         if d == "":
             d = None
         keys = request.POST.get("keywords")
+	#pprint(request.POST, sys.stderr)
+	groups = request.POST.getlist('shared[]')
         priv = request.POST.get("private", False)
         enc = request.POST.get("encrypt", False)
 
@@ -169,6 +176,17 @@ def add_report(request):
         rep = reports(author=auth, short=sh, details=det, location=loc, date=d, keywords=keys, encrypt=enc, private=priv)
         rep.folder = parent
         rep.save()
+
+	#pprint(groups, sys.stderr)
+	user = User.objects.get(username=request.user)
+	for g in groups: 
+	 #   pprint(g, sys.stderr) 
+	    group = user.groups.get(id=g) 
+	  #  pprint(group)
+	    rep.groups.add(group)		
+
+	groups = rep.groups.all()
+
         # Save Files associated to the report
         files = request.FILES.getlist('files[]')
         if enc: 
@@ -195,21 +213,22 @@ def add_report(request):
             os.remove(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), str(filename)))
             pprint(enckey, sys.stderr)	
             doc = Document.objects.all().filter(report=rep) 		
-            return render(request, 'encUpload.html', {'report': rep, 'documents': doc, 'enckey': enckey})
+            return render(request, 'encUpload.html', {'report': rep, 'documents': doc, 'enckey': enckey, 'groups': groups})
         else: 
             for f in files: 
                 doc = Document(docfile=f, report=rep)
                 doc.save()
 
             # entries = reports.objects.all().filter(private=False)
-            return HttpResponseRedirect(reverse('home'))
+	    return HttpResponseRedirect(reverse('home'))
             # return render(request, 'index.html', {'report': entries})
         
-
     entries = reports.objects.all()
     folders = profile.folder_set.all()
+    user = User.objects.get(username=request.user)
+    groups = user.groups.all() 
 
-    return render(request, 'add_report.html', {'report': entries, 'folder': folders})
+    return render(request, 'add_report.html', {'report': entries, 'folder': folders, 'groups': groups})
 
 
 def normalize_query(query_string,

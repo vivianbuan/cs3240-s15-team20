@@ -32,6 +32,8 @@ from django.utils.http import is_safe_url
 from pprint import pprint 
 import sys
 
+from django.contrib.auth.models import User
+
 # Create your views here.
 
 @sensitive_post_parameters()
@@ -491,35 +493,41 @@ def group_details(request, pk):
 #    pprint(users, sys.stderr)
  #   pprint(usergroup.group.name, sys.stderr) 
     name = str(usergroup.group.name)
-    
-    return render(request, 'group_details.html', {'group': usergroup.group, 'group_name': name, 'users': users})
+        
+    # Get and return the reports that are being shared to this group
+    reports = usergroup.group.reports_set.all()
+    #pprint(reports, sys.stderr)
+    return render(request, 'group_details.html', {'group': usergroup.group, 'group_name': name, 'users': users, 'reports': reports})
+
+
+@login_required(login_url="/accounts/login/")
+def add_group_user(request, pk): 
+    if request.method == "POST":
+    	group = UserGroup.objects.get(pk=pk)
+	users = request.POST.get('usernames')
+        if users == "": 
+	    return profile(request)
+	users = users.split(",")
+	for u in users: 
+	    user = User.objects.get(username=u)
+	    group.group.user_set.add(user) 
+	    group.save() 
+	    group.group.save()     
+        return HttpResponseRedirect(reverse('home'))
+
+    group = UserGroup.objects.get(pk=pk)
+    users = group.user_set.all()
+
+    return render(request, "add_group_user.html", {'group': group, 'users': users})
+
 
 @login_required(login_url="/accounts/login/")
 def add_group(request, creation_form=UserGroupCreationForm):  
     if request.method == "POST":
-	ug = UserGroup()
-	usernames = request.POST.get('username').split(",")
-	add = []
-	keep = None
-	if len(usernames) > 1: 
-		l = 0
-		for u in usernames:
-			if l == 0: 
-				l += 1
-				keep = u.strip()
-			else: 
-				add.append(u.strip())
-		request.POST['username'] = u.strip()
         form = creation_form(data=request.POST)
         if form.is_valid():
-	    pprint(request.POST, sys.stderr)
-	    pprint(form, sys.stderr)
 	    form.save()
-#	    group = UserGroup.objects.filter(group=request.POST.get('groupname'))
-#	    for user in add: 
-#	    	group.user_set.add(user) 
-#	    pprint(form.id, sys.stderr) 
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect(reverse('home'))
     else:
         form = creation_form(request)
     context = {

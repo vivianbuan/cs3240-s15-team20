@@ -50,6 +50,12 @@ Add Report | SecureWitness
           </div>
     </div>
 	<div class="form-group">
+		<label for="name">Share with Groups</label> <br/> 
+		{% for g in groups %} 
+			<input type="checkbox" name="shared[]" value="{{ g.id }}"> {{ g }} </input> <br /> 
+		{% endfor %} 
+	</div> 
+	<div class="form-group">
 		<label for="name">Private/Public</label> <br/>
 		<input type="checkbox" name="private" > Make report private </input>
 	</div>

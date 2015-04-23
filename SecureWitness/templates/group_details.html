@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %} {{ group_name }} | SecureWitness {% endblock %}
+{% block content_title %} 
+  <h2> {{ group_name }} </h2>
+  <p> Users: 
+	{% for user in users %} 
+		{{ user.username }} {% if not forloop.last %}, {% endif %}
+	{% endfor %}  
+  </p>
+{% endblock %} 
+
+{% block content %} 
+	<div class="panel panel-default"> 
+		<div class="panel-body"> 
+			<h3> Shared Reports </h3> 
+			<h5> 
+				{% if reports %} 
+					{% for r in reports %} 
+						<a href="{% url 'reports:detail' r.pk%}" class="list-group-item">
+							<h3> {{ r.short }} </h3>
+							<h4> Posted on {{ r.timestamp }} by {{ r.author }}</h4> 
+						</a>
+					{% endfor %}
+				{% else %} 
+					There are no shared reports for this group. 
+				{% endif %} 
+			</h5> 
+		</div> 
+	</div>
+	<form action="{% url 'accounts:add_group_user' group.pk %}"> 
+		{% csrf_token %} 
+		<div class="form-actions"> 
+			<button type="submit" class="btn btn-primary" name="add_user" value="add_user">Add Users</button> 
+		</div>
+	</form>  
+{% endblock %} 
