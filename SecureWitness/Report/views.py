@@ -255,7 +255,7 @@ def add_report(request):
                     doc = Document(docfile=enc_file, report=rep, md5=md5hash)
                     doc.save() 
                 os.remove(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), str(filename)))
-            pprint(enckey, sys.stderr)	
+            pprint(key, sys.stderr)	
             doc = Document.objects.all().filter(report=rep) 		
             return render(request, 'encUpload.html', {'report': rep, 'documents': doc, 'enckey': enckey, 'groups': groups})
         else: 
