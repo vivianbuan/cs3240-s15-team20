@@ -9,6 +9,8 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.translation import ugettext as _
 
 from django.db.models import Q
 from accounts.models import UserProfile, UserGroup
@@ -177,6 +179,41 @@ def login(request, template_name='myregistration/login.html',
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
 
+def logout(request, next_page=None,
+           template_name='myregistration/logged_out.html',
+           redirect_field_name=REDIRECT_FIELD_NAME,
+           current_app=None, extra_context=None):
+    """
+    Logs out the user and displays 'You are logged out' message.
+    """
+    auth_logout(request)
+
+    if next_page is not None:
+        next_page = resolve_url(next_page)
+
+    if (redirect_field_name in request.POST or
+            redirect_field_name in request.GET):
+        next_page = request.POST.get(redirect_field_name,
+                                     request.GET.get(redirect_field_name))
+        # Security check -- don't allow redirection to a different host.
+        if not is_safe_url(url=next_page, host=request.get_host()):
+            next_page = request.path
+
+    if next_page:
+        # Redirect to this page until the session has been cleared.
+        return HttpResponseRedirect(next_page)
+
+    current_site = get_current_site(request)
+    context = {
+        'site': current_site,
+        'site_name': current_site.name,
+        'title': _('Logged out')
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+    return TemplateResponse(request, template_name, context,
+        current_app=current_app)
+
 
 # def retrieve_password(request):
 #     if request.method == "POST":
@@ -221,9 +258,9 @@ def profile(request):
     groups = UserGroup.objects.all()
 #    pprint(groups, sys.stderr)   
     for g in groups: 
-	users = g.user_set.all()
-	if profile.user in users: 
-		group_list.append(g)		
+        users = g.user_set.all()
+        if profile.user in users: 
+            group_list.append(g)		
 
     root_folder = profile.folder_set.filter(file_name="DEFAULT FOLDER")[0]
     return render(request, 'user_profile.html', {'o': root_folder, 'prof': profile, 'groups': group_list})
@@ -372,7 +409,7 @@ def admin_group(request, group_id):
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
-def admin_creategroup(request, creation_form=GroupCreationForm):
+def admin_creategroup(request, creation_form=UserGroupCreationForm):
     if check_user_fail(request):
         return render(request, 'admin/reject.html')
 
@@ -380,7 +417,7 @@ def admin_creategroup(request, creation_form=GroupCreationForm):
         form = creation_form(data=request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect("/accounts/admin")
+            return render(request, 'admin/action_complete.html')
     else:
         form = creation_form(request)
 
@@ -503,16 +540,16 @@ def group_details(request, pk):
 @login_required(login_url="/accounts/login/")
 def add_group_user(request, pk): 
     if request.method == "POST":
-    	group = UserGroup.objects.get(pk=pk)
-	users = request.POST.get('usernames')
+        group = UserGroup.objects.get(pk=pk)
+        users = request.POST.get('usernames')
         if users == "": 
-	    return profile(request)
-	users = users.split(",")
-	for u in users: 
-	    user = User.objects.get(username=u)
-	    group.group.user_set.add(user) 
-	    group.save() 
-	    group.group.save()     
+            return profile(request)
+        users = users.split(",")
+        for u in users: 
+            user = User.objects.get(username=u)
+            group.group.user_set.add(user) 
+            group.save() 
+            group.group.save()
         return HttpResponseRedirect(reverse('home'))
 
     group = UserGroup.objects.get(pk=pk)
@@ -526,7 +563,7 @@ def add_group(request, creation_form=UserGroupCreationForm):
     if request.method == "POST":
         form = creation_form(data=request.POST)
         if form.is_valid():
-	    form.save()
+            form.save()
             return HttpResponseRedirect(reverse('home'))
     else:
         form = creation_form(request)

@@ -8,6 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('auth', '0006_require_contenttypes_0002'),
+        ('auth', '0001_initial'),
         ('Report', '0015_reports_encrypt'),
     ]
 
@@ -16,5 +17,6 @@ class Migration(migrations.Migration):
             model_name='reports',
             name='groups',
             field=models.ManyToManyField(to='auth.Group'),
+            preserve_default=True,
         ),
     ]
