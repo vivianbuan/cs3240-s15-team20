@@ -42,7 +42,9 @@
 				</h4>
 				<ul {% if report.encrypt %}id="enc" class="hide"{% endif %}>
 				{% for document in documents %}
-					<li><a href="{{ document.docfile.url }}"><span id="doc{{ forloop.counter0 }}"> {{ document.docfile.name }} </span></a></li>
+					<li>
+						<a href="{{ document.docfile.url }}"><span id="doc{{ forloop.counter0 }}">{{ document.docfile.name }}</span></a>, md5: {{ document.md5 }}
+					</li>
 				{% endfor %}
 				</ul>
 			{% else %} 
