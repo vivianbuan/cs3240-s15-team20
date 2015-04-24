@@ -19,7 +19,7 @@ from Crypto import Random
 import os
 from django.core.files import File
 from django.contrib.auth.models import User
-
+import hashlib
 
 def home(request):
     entries = reports.objects.all().filter(private=False)[:20]
@@ -105,7 +105,7 @@ def edit(request, pk):
             if d == "":
                 d = None
             priv = request.POST.get("private", False)
-            enc = request.POST.get("encrypt", False)
+            #enc = request.POST.get("encrypt", False)
 
             # if rep.author == auth:
                 # Update the changes
@@ -118,26 +118,62 @@ def edit(request, pk):
                 rep.private = True
             else:
                 rep.private = priv
-            if enc == "on":
-                rep.encrypt = True
-            else:
-                rep.encrypt = enc
-                rep.folder = parent
+            #if enc == "on":
+             #   rep.encrypt = True
+            #else:
+             #   rep.encrypt = enc
+            rep.folder = parent
                 # Save the changes
-                rep.save()
+            rep.save()
 
-                # Make changes to existing files
-                for d in doc:
-                    check = request.POST.get(d.docfile.name, False)
-                    if check or check == "on":
-                        d.delete()
-
-                # Upload any new files
-                files = request.FILES.getlist('files[]')
-                for f in files:
-                    document = Document(docfile=f, report=rep)
-                    document.save()
-
+            # Make changes to existing files
+	    enc = rep.encrypt
+            for d in doc:
+                check = request.POST.get(d.docfile.name, False)
+                if check or check == "on":
+                    d.delete()
+            # Upload any new files
+            files = request.FILES.getlist('files[]')
+            if enc or enc == "on": 
+	        key = os.urandom(16)  #  Generate Key
+	        #enckey = key.decode('utf-16')
+	        enckey=""
+	        for byte in key:
+	            enckey = enckey + str(byte) + 'x'
+	        for f in files:
+       	 	    BLOCKSIZE = 65536
+		    hasher = hashlib.md5()
+	            filename = f.name + ".enc"
+	            with open(str(filename), 'wb') as out_file: 
+	                chunk_size = 8192 
+	                iv = Random.new().read(AES.block_size)
+	                crypt = AES.new(key, AES.MODE_CBC, iv) 
+	                out_file.write(iv)
+	                for chunk in f.chunks(chunk_size):
+	                    if len(chunk) % 16 != 0: 
+	                        chunk += b' ' * (16 - len(chunk) % 16)
+	                    out_file.write(crypt.encrypt(chunk)) 
+		    for chunk in f.chunks(BLOCKSIZE): 
+		 	#buf = chunk
+  		        hasher.update(buf)  
+  		    md5hash = hasher.hexdigest() 
+	            with open(str(filename), 'rb') as out_file:
+	                enc_file = File(out_file) 
+	                doc = Document(docfile=enc_file, report=rep, md5=md5hash)
+	                doc.save() 
+	            os.remove(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), str(filename)))
+	        pprint(enckey, sys.stderr)
+ 	    else: 
+                for f in files: 
+   		    BLOCKSIZE = 65536
+		    hasher = hashlib.md5() 
+		    for chunk in f.chunks(BLOCKSIZE): 
+		        #buf = chunk
+		        hasher.update(chunk)
+	  	    md5hash = hasher.hexdigest() 
+	            doc = Document(docfile=f, report=rep, md5=md5hash)
+	            doc.save()
+	
                 doc = Document.objects.all().filter(report=rep)
                 # return render(request, 'edit.html', {'report': rep, 'documents': doc, 'folder': folders, 'error': message})
                 return HttpResponseRedirect(reverse('reports:detail', args=[pk]))
@@ -196,27 +232,43 @@ def add_report(request):
             for byte in key:
                 enckey = enckey + str(byte) + 'x'
             for f in files:
+		BLOCKSIZE = 65536
+		hasher = hashlib.md5()
                 filename = f.name + ".enc"
-            with open(str(filename), 'wb') as out_file: 
-                chunk_size = 8192 
-                iv = Random.new().read(AES.block_size)
-                crypt = AES.new(key, AES.MODE_CBC, iv) 
-                out_file.write(iv)
-                for chunk in f.chunks(chunk_size):
-                    if len(chunk) % 16 != 0: 
-                        chunk += b' ' * (16 - len(chunk) % 16)
-                    out_file.write(crypt.encrypt(chunk)) 
-            with open(str(filename), 'rb') as out_file:
-                enc_file = File(out_file) 
-                doc = Document(docfile=enc_file, report=rep)
-                doc.save() 
-            os.remove(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), str(filename)))
+                with open(str(filename), 'wb') as out_file: 
+                    chunk_size = 8192 
+                    iv = Random.new().read(AES.block_size)
+                    crypt = AES.new(key, AES.MODE_CBC, iv) 
+                    out_file.write(iv)
+                    for chunk in f.chunks(chunk_size):
+                        if len(chunk) % 16 != 0: 
+                            chunk += b' ' * (16 - len(chunk) % 16)
+                        out_file.write(crypt.encrypt(chunk)) 
+		for chunk in f.chunks(BLOCKSIZE): 
+	 	    #buf = afile.read(BLOCKSIZE)
+		    #while len(buf) > 0: 
+		    hasher.update(chunk) 
+		#buf = afile.read(BLOCKSIZE) 
+		md5hash = hasher.hexdigest() 
+                with open(str(filename), 'rb') as out_file:
+                    enc_file = File(out_file) 
+                    doc = Document(docfile=enc_file, report=rep, md5=md5hash)
+                    doc.save() 
+                os.remove(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), str(filename)))
             pprint(enckey, sys.stderr)	
             doc = Document.objects.all().filter(report=rep) 		
             return render(request, 'encUpload.html', {'report': rep, 'documents': doc, 'enckey': enckey, 'groups': groups})
         else: 
             for f in files: 
-                doc = Document(docfile=f, report=rep)
+		BLOCKSIZE = 65536
+		hasher = hashlib.md5() 
+		for chunk in f.chunks(BLOCKSIZE): 
+		    #buf = afile.read(BLOCKSIZE)
+		    #while len(buf) > 0: 
+  		    hasher.update(chunk)
+		#buf = afile.read(BLOCKSIZE)
+		md5hash = hasher.hexdigest() 
+                doc = Document(docfile=f, report=rep, md5=md5hash)
                 doc.save()
 
             # entries = reports.objects.all().filter(private=False)
