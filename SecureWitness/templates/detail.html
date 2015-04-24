@@ -2,7 +2,7 @@
 
 {% block title %}{{report.short}} | SecureWitness{% endblock %}
 {% block content_title %}
-  <h2>{{report.short}}</h2>
+  <h2><span id="short">{{report.short}}</span></h2>
   <p> By: {{ report.author }}</p>
 {% endblock %}
 
@@ -12,20 +12,22 @@
 		<div class="panel-body">
 			<h4>Long Description:</h4> 
 			<h5> 
-				{{ report.details }}
+				<span id="long">{{ report.details }}</span>
 			</h5>
-			<h4>Location:<span class="h5">{{ report.location }}</span></h4>
-			<h4>Date: <span class="h5">{{ report.date }}</span></h4>
-			<h4>Keywords: <span class="h5">{{ report.keywords }}</span></h4>
+			<h4>Location:<span id="loc" class="h5">{{ report.location }}</span></h4>
+			<h4>Date: <span id="date" class="h5">{{ report.date }}</span></h4>
+			<h4>Keywords: <span id="keys"class="h5">{{ report.keywords }}</span></h4>
 			{% if groups|length > 0 %} 
 				<h4>Shared groups: </h4>
+				<ul>
 				{% for  g in groups %} 
-					<span class="h5"> {{ g }} </h5> <br /> 
+					<li><span id="group{{ forloop.counter0 }}" class="h5">{{ g }}</span></li>
 				{% endfor %}
+				</ul>
 			{% else %} 
 				<h4>Shared groups:<span class="h5"> None</span></h4>
 			{% endif %} 
-			<h4>Private: <span class="h5">{{ report.private }}</span></h4>
+			<h4>Private: <span id="private" class="h5">{{ report.private }}</span></h4>
 			<h4>Attachments:
 			{% if documents %}
 				{% if report.encrypt%}
@@ -38,9 +40,9 @@
 					{% endif %}  attached to this report.</span>
 				{% endif %}
 				</h4>
-				<ul {% if report.encrypt %}class="hide"{% endif %}>
+				<ul {% if report.encrypt %}id="enc" class="hide"{% endif %}>
 				{% for document in documents %}
-					<li><a href="{{ document.docfile.url }}"> {{ document.docfile.name }} </a></li>
+					<li><a href="{{ document.docfile.url }}"><span id="doc{{ forloop.counter0 }}"> {{ document.docfile.name }} </span></a></li>
 				{% endfor %}
 				</ul>
 			{% else %} 
