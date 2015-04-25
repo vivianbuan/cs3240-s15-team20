@@ -171,8 +171,8 @@ def edit(request, pk):
                         #buf = chunk
                         hasher.update(chunk)
                         md5hash = hasher.hexdigest() 
-            doc = Document(docfile=f, report=rep, md5=md5hash)
-            doc.save()
+                    doc = Document(docfile=f, report=rep, md5=md5hash)
+                    doc.save()
 
             doc = Document.objects.all().filter(report=rep)
             # return render(request, 'edit.html', {'report': rep, 'documents': doc, 'folder': folders, 'error': message})
@@ -244,7 +244,7 @@ def add_report(request):
                         if len(chunk) % 16 != 0: 
                             chunk += b' ' * (16 - len(chunk) % 16)
                         out_file.write(crypt.encrypt(chunk)) 
-                for chunk in f.chunks(BLOCKSIZE): 
+                for chunk in f.chunks(BLOCKSIZE):
                 	    #buf = afile.read(BLOCKSIZE)
                     #while len(buf) > 0: 
                     hasher.update(chunk) 
@@ -259,7 +259,7 @@ def add_report(request):
             doc = Document.objects.all().filter(report=rep) 		
             return render(request, 'encUpload.html', {'report': rep, 'documents': doc, 'enckey': enckey, 'groups': groups})
         else: 
-            for f in files: 
+            for f in files:
                 BLOCKSIZE = 65536
                 hasher = hashlib.md5() 
                 for chunk in f.chunks(BLOCKSIZE): 
