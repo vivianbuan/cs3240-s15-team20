@@ -59,14 +59,14 @@
 	<form action="{% url 'reports:edit' report.pk %}" method="post">
 		{% csrf_token %}
 		<div class="form-actions">
-			<button type="submit" class="btn btn-primary" name="edit" value="Edit">Edit</button>
-		</div>
-	</form>
-	<form action="{% url 'reports:delete' report.pk %}" method="post">
-		{% csrf_token %}
-		<div class="form-actions">
-			<button type="submit" class="btn btn-primary" name="delete" value="Delete">Delete</button>
+			<button type="submit" class="btn btn-primary btn-margin-left" name="edit" value="Edit" style="float: right;">Edit</button>
 		</div>
 	</form>
 
+	<form action="{% url 'reports:delete' report.pk %}" method="post">
+		{% csrf_token %}
+		<div class="form-actions">
+			<button type="submit" class="btn btn-primary " name="delete" value="Delete" style="float: right; ">Delete</button>
+		</div>
+	</form>
 {% endblock %}
