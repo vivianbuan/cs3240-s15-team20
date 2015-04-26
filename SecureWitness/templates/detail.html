@@ -7,10 +7,11 @@
 {% endblock %}
 
 {% block content %}
-	<h5>Posted on {{ report.timestamp }} by {{ report.author}}</h5>
+    <h4>Posted on {{ report.timestamp }} by {{ report.author}}</h4>
 	<div class="panel panel-default">
 		<div class="panel-body">
-			<h4>Long Description:</h4> 
+
+			<h4>Long Description:</h4>
 			<h5> 
 				<span id="long">{{ report.details }}</span>
 			</h5>
@@ -56,17 +57,63 @@
 {#        <button type="submit" name="edit" class="btn btn-primary" value="Edit"> Edit </button>#}
 {#        <button type="submit" name="delete" class="btn btn-primary" value="Delete"> Delete </button>#}
 {#	</div>#}
+
+
 	<form action="{% url 'reports:edit' report.pk %}" method="post">
 		{% csrf_token %}
 		<div class="form-actions">
-			<button type="submit" class="btn btn-primary btn-margin-left" name="edit" value="Edit" style="float: right;">Edit</button>
+			<button type="submit" class="btn btn-primary " name="edit" value="Edit" style="float: right; ">Edit</button>
 		</div>
 	</form>
+
 
 	<form action="{% url 'reports:delete' report.pk %}" method="post">
 		{% csrf_token %}
 		<div class="form-actions">
-			<button type="submit" class="btn btn-primary " name="delete" value="Delete" style="float: right; ">Delete</button>
+			<button type="submit" class="btn btn-primary " name="Delete" value="Delete" style="float: right; ">Delete</button>
 		</div>
 	</form>
+
+<div>
+<h3>Comments:</h3>
+</div>
+
+<form action={% url 'reports:detail' report.pk %} method="post" enctype="multipart/form-data" role="form">
+
+    {% for comment in comments %}
+    <div class="panel panel-default">
+      <div class="panel-body">
+
+            <span id="long">Written by:{{ comment.name }}</span>
+
+            <span id="long">{{ comment.text|linebreaks}}</span>
+
+        </div>
+        </div>
+    {% endfor %}
+
+	{% csrf_token %}
+	<div class="form-group">
+		<input type="hidden" class="form-control" placeholder="Author" name="author" value="{{ user.username }}"></input>
+	</div>
+
+	<div class="form-group">
+		<label for="name">Comment</label>
+		<textarea class="form-control" rows="3" placeholder="Type your comment" name="comment"></textarea>
+	</div>
+    <div class="form-actions">
+		<button type="submit" class="btn btn-primary"> Add </button>
+	</div>
+    </form>
+
 {% endblock %}
+
+
+
+
+
+
+
+
+
+
