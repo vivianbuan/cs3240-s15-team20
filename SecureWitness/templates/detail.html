@@ -83,11 +83,8 @@
     {% for comment in comments %}
     <div class="panel panel-default">
       <div class="panel-body">
-
-            <span id="long">Written by:{{ comment.name }}</span>
-
-            <span id="long">{{ comment.text|linebreaks}}</span>
-
+            <span id="long" ><strong>Written by:  </strong>{{ comment.name }}
+             {{comment.text|linebreaks}}</span>
         </div>
         </div>
     {% endfor %}
@@ -102,9 +99,10 @@
 		<textarea class="form-control" rows="3" placeholder="Type your comment" name="comment"></textarea>
 	</div>
     <div class="form-actions">
-		<button type="submit" class="btn btn-primary"> Add </button>
+		<button type="submit" class="btn btn-primary"style="float: right; "> Add </button>
 	</div>
     </form>
+
 
 {% endblock %}
 
