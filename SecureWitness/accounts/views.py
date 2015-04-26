@@ -233,6 +233,7 @@ def retrieve_password(request):
                 profile = user_filter[0]
                 if profile.user.email == email_address:
                     current_site = get_current_site(request)
+                    token_generator = default_token_generator
 
                     c = {
                     'email': email_address,
@@ -240,7 +241,7 @@ def retrieve_password(request):
                     'site_name': current_site.name,
                     'uid': urlsafe_base64_encode(force_bytes(profile.user.pk)),
                     'user_prof': profile,
-                    'token': default_token_generator.make_token(profile.user),
+                    'token': token_generator.make_token(profile.user),
                     'protocol': 'http',
                     }
                     subject = 'Password Reset'
@@ -266,9 +267,10 @@ def password_reset_confirm(request, uidb64, token):
     else:
         profile = user[0]
         if default_token_generator.check_token(profile.user, token):
-            validlink = False
-        else:
             validlink = True
+        else:
+            validlink = False
+        # validlink = True
     if request.method == 'POST':
         password1 = request.POST.get("new_password1")
         password2 = request.POST.get("new_password2")
