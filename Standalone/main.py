@@ -7,6 +7,9 @@ from DetailParser import DetailParser
 import html
 import getpass
 
+from Crypto import Random
+from Crypto.Cipher import AES
+
 _DEBUG = True
 cj = cookiejar.CookieJar()
 opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
@@ -83,16 +86,38 @@ def filedownload(url,doc, enc):
 	file_name = address.split('/')[-1]
 	with opener.open(address) as u:
 		with open(file_name, 'wb') as f:
-			if not enc:
-				f.write(u.read())
-			else:
-				print("time to decrypt")
+			f.write(u.read())
+		if enc:
+			file_name_out = file_name[:-4]
+			print(file_name_out)
+			keystring=input("Input the key for decryption: ")
+			keystring=keystring.split("x")
+			keybytes=[]
+			for string in keystring[:-1]:
+				keybytes.append(int(string))
+			key=bytes(keybytes)
+			decrypt_file(file_name,file_name_out,key)
+		print("Download Successful!")
+
+def decrypt_file(in_filename, out_filename, key): 
+	chunk_size = 8192
+#	crypt = AES.new(key, AES.MODE_CBC, iv)
+	
+	with open(in_filename, 'rb') as in_file: 
+		iv = in_file.read(AES.block_size)
+		crypt = AES.new(key, AES.MODE_CBC, iv) 
+		with open(out_filename, 'wb') as out_file: 
+			while True: 
+				chunk = in_file.read(chunk_size) 
+				if len(chunk) == 0: 
+					break
+				out_file.write(crypt.decrypt(chunk)) 
 
 if __name__=="__main__":
 	while True:
 		url = input("Site URL: ")
 		username = input("Username: ")
-		pswd = getpass.getpass('Password:')
+		pswd = getpass.getpass('Password: ')
 		if auth(url,username,pswd):
 			loggedIn = True
 			break
