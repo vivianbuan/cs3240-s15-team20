@@ -45,3 +45,11 @@ class Document(models.Model):
 	if not self.id:
 		pprint(args, sys.stderr)  			
 	super(Document, self).save(*args, **kwargs) '''
+
+class Comment(models.Model):
+    name = models.CharField(max_length=42)
+    text = models.TextField()
+    report = models.ForeignKey(reports)
+
+    def __unicode__(self):
+        return self.text
