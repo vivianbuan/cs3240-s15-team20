@@ -8,6 +8,7 @@
   	{% if prof.is_admin %}
   	(<a href="{% url 'accounts:admin_page' %}">Administrator</a>)
   	{% endif %}
+    <h3 align="left"> <a href="{% url 'accounts:reset_password'%}" class = "btn btn-primary"> Reset Password</a></h3>
   </h2>
 {% endblock %}
 

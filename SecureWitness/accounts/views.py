@@ -21,7 +21,10 @@ from accounts.forms import GroupCreationForm, UserGroupCreationForm, GroupAdditi
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm
 from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_decode
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.template.loader import render_to_string
+from django.utils.http import int_to_base36
 from django.core.mail import send_mail
 import hashlib,datetime, random
 from django.utils import timezone
@@ -162,8 +165,8 @@ def login(request, template_name='myregistration/login.html',
                 auth_login(request, form.get_user())
 
                 return HttpResponseRedirect(redirect_to)
-        # elif request.POST.get("forgetP"):
-        #     return HttpResponseRedirect(reverse('accounts:retrieve_password'))
+        elif request.POST.get("forgetP"):
+            return HttpResponseRedirect(reverse('accounts:retrieve_password'))
         else:
             error_type = 4
             return render(request, 'error_page.html', {'t': error_type})
@@ -215,28 +218,108 @@ def logout(request, next_page=None,
         current_app=current_app)
 
 
-# def retrieve_password(request):
-#     if request.method == "POST":
-#         if request.POST.get("cancel"):
-#             return HttpResponseRedirect(reverse('accounts:login'))
-#         elif request.POST.get("resetP"):
-#             request_name = request.POST.get("username")
-#             email_address = request.POST.get("email")
-#             user_filter = UserProfile.objects.filter(user__username=request_name)
-#             if len(user_filter) == 0:
-#                 error = "This username does not exist!"
-#                 return render(request, 'myregistration/password_reset_form.html', {'message': error})
-#             else:
-#                 profile = user_filter[0]
-#                 if profile.user.email == email_address:
-#
-#                 else:
-#                     error = "The email address you entered is not compatible with the username!"
-#                     return render(request, 'myregistration/password_reset_form.html', {'message': error})
-#         else:
-#             error_type = 4
-#             return render(request, 'error_page.html', {'t': error_type})
-#     return render(request, 'myregistration/password_reset_form.html')
+def retrieve_password(request):
+    if request.method == "POST":
+        if request.POST.get("cancel"):
+            return HttpResponseRedirect(reverse('accounts:login'))
+        elif request.POST.get("resetP"):
+            request_name = request.POST.get("username")
+            email_address = request.POST.get("email")
+            user_filter = UserProfile.objects.filter(user__username=request_name)
+            if len(user_filter) == 0:
+                error = "This username does not exist!"
+                return render(request, 'myregistration/password_reset_form.html', {'message': error})
+            else:
+                profile = user_filter[0]
+                if profile.user.email == email_address:
+                    current_site = get_current_site(request)
+
+                    c = {
+                    'email': email_address,
+                    'domain': current_site.domain,
+                    'site_name': current_site.name,
+                    'uid': urlsafe_base64_encode(force_bytes(profile.user.pk)),
+                    'user_prof': profile,
+                    'token': default_token_generator.make_token(profile.user),
+                    'protocol': 'http',
+                    }
+                    subject = 'Password Reset'
+                    email = render_to_string('myregistration/password_reset_email.html', c)
+                    send_mail(subject, email, 'viviancaas@gmail.com', [profile.user.email], fail_silently=False)
+                    return render(request, 'myregistration/password_reset_done.html')
+                else:
+                    error = "The email address you entered is not compatible with the username!"
+                    return render(request, 'myregistration/password_reset_form.html', {'message': error})
+        else:
+            error_type = 4
+            return render(request, 'error_page.html', {'t': error_type})
+    return render(request, 'myregistration/password_reset_form.html')
+
+
+def password_reset_confirm(request, uidb64, token):
+    uid = urlsafe_base64_decode(uidb64)
+    user = UserProfile.objects.filter(user__pk=uid)
+
+    if len(user) == 0:
+        validlink = False
+        # return render(request, 'myregistration/password_reset_confirm.html', {'validlink': validlink})
+    else:
+        profile = user[0]
+        if default_token_generator.check_token(profile.user, token):
+            validlink = False
+        else:
+            validlink = True
+    if request.method == 'POST':
+        password1 = request.POST.get("new_password1")
+        password2 = request.POST.get("new_password2")
+        if len(password1)==0:
+            error = "Error: your password is empty"
+            return render(request, 'myregistration/password_reset_confirm.html', {'validlink': validlink, 'message': error,
+                                                                                      'uidb64': uidb64, 'token': token})
+        elif password1 != password2:
+            error = "Error: the two password you entered do not match"
+            return render(request, 'myregistration/password_reset_confirm.html', {'validlink': validlink, 'message': error,
+                                                                                       'uidb64': uidb64, 'token': token})
+        else:
+            profile.user.set_password(password1)
+            profile.user.save()
+            profile.save()
+            return HttpResponseRedirect(reverse('accounts:password_reset_complete'))
+    return render(request, 'myregistration/password_reset_confirm.html', {'validlink': validlink, 'uidb64': uidb64,
+                                                                          'token': token})
+
+
+def password_reset_complete(request):
+    return render(request, 'myregistration/password_reset_complete.html')
+
+
+def reset_password(request):
+    if request.user.is_active:
+        profile = UserProfile.objects.filter(user=request.user)[0]
+    else:
+        profile = None
+
+    if request.method == 'POST':
+        old_password = request.POST.get("old_password")
+        new_password1 = request.POST.get("new_password1")
+        new_password2 = request.POST.get("new_password2")
+        if not profile.user.check_password(old_password):
+            error = "Your old password was incorrect. Please try again"
+            return render(request, 'myregistration/password_change_form.html', {'message': error})
+        elif new_password1 != new_password2:
+            error = "The two new password you entered do not match. Please try again."
+            return render(request, 'myregistration/password_change_form.html', {'message': error})
+        else:
+            profile.user.set_password(new_password1)
+            profile.user.save()
+            profile.save()
+            return HttpResponseRedirect(reverse('accounts:reset_password_done'))
+    return render(request, 'myregistration/password_change_form.html')
+
+
+def reset_password_done(request):
+    return render(request, 'myregistration/password_change_done.html')
+
 
 @login_required(login_url="/accounts/login/")
 def profile(request):
