@@ -152,17 +152,17 @@ def edit(request, pk):
                         for chunk in f.chunks(chunk_size):
                             if len(chunk) % 16 != 0: 
                                 chunk += b' ' * (16 - len(chunk) % 16)
-                        out_file.write(crypt.encrypt(chunk)) 
-                    for chunk in f.chunks(BLOCKSIZE): 
-                        #buf = chunk
-                        hasher.update(buf)  
-                        md5hash = hasher.hexdigest() 
+                            out_file.write(crypt.encrypt(chunk)) 
+                            hasher.update(chunk)
+                    md5hash = hasher.hexdigest() 
                     with open(str(filename), 'rb') as out_file:
                         enc_file = File(out_file) 
                         doc = Document(docfile=enc_file, report=rep, md5=md5hash)
                         doc.save() 
                     os.remove(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), str(filename)))
                     pprint(enckey, sys.stderr)
+                    doc = Document.objects.all().filter(report=rep)
+                    return render(request, 'encUpload.html', {'report': rep, 'documents': doc, 'enckey': enckey})
             else: 
                 for f in files: 
                     BLOCKSIZE = 65536
@@ -170,7 +170,7 @@ def edit(request, pk):
                     for chunk in f.chunks(BLOCKSIZE): 
                         #buf = chunk
                         hasher.update(chunk)
-                        md5hash = hasher.hexdigest() 
+                    md5hash = hasher.hexdigest() 
                     doc = Document(docfile=f, report=rep, md5=md5hash)
                     doc.save()
 
@@ -244,12 +244,14 @@ def add_report(request):
                         if len(chunk) % 16 != 0: 
                             chunk += b' ' * (16 - len(chunk) % 16)
                         out_file.write(crypt.encrypt(chunk)) 
-                for chunk in f.chunks(BLOCKSIZE):
+                        hasher.update(chunk)
                 	    #buf = afile.read(BLOCKSIZE)
                     #while len(buf) > 0: 
-                    hasher.update(chunk) 
+                    #hasher.update(chunk) 
                     #buf = afile.read(BLOCKSIZE) 
-                    md5hash = hasher.hexdigest() 
+                    #md5hash = hasher.hexdigest() 
+                md5hash = hasher.hexdigest() 
+                #print(md5hash)
                 with open(str(filename), 'rb') as out_file:
                     enc_file = File(out_file) 
                     doc = Document(docfile=enc_file, report=rep, md5=md5hash)
@@ -267,7 +269,7 @@ def add_report(request):
                     #while len(buf) > 0: 
                     hasher.update(chunk)
                     #buf = afile.read(BLOCKSIZE)
-                    md5hash = hasher.hexdigest() 
+                md5hash = hasher.hexdigest() 
                 doc = Document(docfile=f, report=rep, md5=md5hash)
                 doc.save()
 

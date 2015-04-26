@@ -5,6 +5,7 @@ class DetailParser(HTMLParser):
 	encrypted=False
 	doc=""
 	docs=[]
+	hashes=[]
 
 	def handle_starttag(self, tag, attrs):
 		# print("Start: " + tag)
@@ -39,6 +40,8 @@ class DetailParser(HTMLParser):
 					string = "Document " + value.split('doc')[1] + ": "
 					print(string, end="")
 					self.docs.append(self.doc)
+				if "hash" in value:
+					self.reading="hash"
 			if name == "href" and tag == "a":
 				self.doc=value
 
@@ -53,6 +56,8 @@ class DetailParser(HTMLParser):
 			pass
 		elif self.reading is "print":
 			print(data, end="")
+		elif self.reading is "hash":
+			self.hashes.append(data)
 		else:
 			print("Error, Unhandled action")
 
@@ -63,3 +68,11 @@ class DetailParser(HTMLParser):
 			c = chr(int(name))
 		if self.reading is 'print':
 			print(c, end="")
+
+	def clear(self):
+		self.reading="None"
+		self.encrypted=False
+		self.doc=""
+		self.docs=[]
+		self.hashes=[]
+		print("Clear: " + str(self.docs) + " " + str(self.hashes))

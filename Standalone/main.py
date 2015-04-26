@@ -6,9 +6,13 @@ from MainParser import MainParser, AuthParser
 from DetailParser import DetailParser
 import html
 import getpass
+import os
+import hashlib
 
 from Crypto import Random
 from Crypto.Cipher import AES
+
+from django.core.files import File
 
 _DEBUG = True
 cj = cookiejar.CookieJar()
@@ -69,6 +73,7 @@ def auth(url,username, password):
 def detail(url, username, password, num):
 	string = getpage(url,username,password,'/reports/detail/'+num+'/')
 	parser = DetailParser()
+	parser.clear()
 	# print(string)
 	parser.feed(string)
 	while(True):
@@ -78,18 +83,18 @@ def detail(url, username, password, num):
 		if fileno >= len(parser.docs):
 			print("Incorrect input: That doc does not exist")
 			continue
-		filedownload(url, parser.docs[fileno],parser.encrypted)
+		filedownload(url, parser.docs[fileno],parser.encrypted, parser.hashes[fileno])
 	parser.close()
 
-def filedownload(url,doc, enc):
+def filedownload(url,doc, enc, hashnum):
 	address=url+doc
 	file_name = address.split('/')[-1]
 	with opener.open(address) as u:
 		with open(file_name, 'wb') as f:
 			f.write(u.read())
+
 		if enc:
 			file_name_out = file_name[:-4]
-			print(file_name_out)
 			keystring=input("Input the key for decryption: ")
 			keystring=keystring.split("x")
 			keybytes=[]
@@ -97,7 +102,23 @@ def filedownload(url,doc, enc):
 				keybytes.append(int(string))
 			key=bytes(keybytes)
 			decrypt_file(file_name,file_name_out,key)
-		print("Download Successful!")
+			os.remove(file_name)
+			file_name=file_name_out
+
+		with open(file_name, 'rb') as fileReader:
+			f = File(fileReader)
+			BLOCKSIZE = 65536
+			hasher = hashlib.md5() 
+			for chunk in f.chunks(BLOCKSIZE):
+				hasher.update(chunk)
+				md5hash = hasher.hexdigest() 
+		#print(hashnum)
+		#print(md5hash)
+		if hashnum == md5hash:
+			print("Download Successful!")
+		else:
+			print("Download Error. Please Retry.")
+			print("\tIf the file was encrypted, ensure you have the correct key.")
 
 def decrypt_file(in_filename, out_filename, key): 
 	chunk_size = 8192
