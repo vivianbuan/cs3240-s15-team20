@@ -1,12 +1,31 @@
+
 {% extends "base.html" %}
 
 {% block title %}Search Reports | SecureWitness{% endblock %}
 {% block content_title %}
   <h2>Search Reports</h2>
+     <h5 style="color:red;"> *Private reports cannot be searched*  </h5>
 {% endblock %}
 
+
+
 {% block content %}
-    <form class="well-sm" method="get" action="{% url 'reports:search' %}">
+
+        <h4> Search All</h4>
+      <form class="well-sm" method="get" action="{% url 'reports:search' %}">
+        <div class="input-group">
+            <input type="text" class="form-control" name="a" id="id_q" placeholder="Search for...">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="submit">
+                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                </button>
+            </span>
+            </div>
+        </form>
+
+    <h4>Advanced Search</h4>
+
+     <form class="well-sm" method="get" action="{% url 'reports:search' %}">
         <div class="input-group">
             <input type="text" class="form-control" name="q" id="id_q" placeholder="Search for...">
             <span class="input-group-btn">
@@ -14,8 +33,12 @@
                     <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                 </button>
             </span>
-        </div>
-    </form>
+            </div>
+        </form>
+
+
+
+
     <div class="list-group well-lg">
     {% for r in found_entries %}
         {% if r.private == False %}

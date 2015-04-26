@@ -7,14 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Report', '0012_auto_20150413_2110'),
+        ('Report', '0001_initial'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='folder',
-            name='owner',
-            field=models.ForeignKey(to='accounts.UserProfile', related_name='folder_set', default=None, null=True),
+            model_name='document',
+            name='md5',
+            field=models.CharField(default='', max_length=32, null=True),
             preserve_default=True,
         ),
     ]

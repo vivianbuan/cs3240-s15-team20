@@ -48,9 +48,9 @@ Edit Report | SecureWitness
 			{% endfor %}
 		{% endif %}
 		{% if report.encrypt %} 
-			<input type="checkbox" name="encrypt" checked> Encrypt uploaded files </input> 
+			<input type="checkbox" name="encrypt" disabled checked> Encrypt uploaded files </input> 
 		{% else %} 
-			<input type="checkbox" name="encrypt"> Encrypt uploaded files </input> 
+			<input type="checkbox" name="encrypt" disabled> Encrypt uploaded files </input> 
 		{% endif %} 
 	</div>
     <div class="form-group">

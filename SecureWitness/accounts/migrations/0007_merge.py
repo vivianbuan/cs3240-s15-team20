@@ -7,12 +7,9 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Report', '0006_auto_20150401_2127'),
+        ('accounts', '0006_auto_20150423_1450'),
+        ('accounts', '0006_auto_20150423_1615'),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='reports',
-            name='title',
-        ),
     ]
