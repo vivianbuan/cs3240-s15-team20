@@ -67,6 +67,8 @@ def register(request, creation_form=UserCreationForm, extra_context=None):
             key_expires = datetime.datetime.today() + datetime.timedelta(2)
             profile.activation_key = activation_key
             profile.key_expires = key_expires
+            if len(UserProfile.objects.all()) is 0:
+                profile.administrator = 1
             profile.save()
 
             # Send email with activation key
