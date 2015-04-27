@@ -62,7 +62,7 @@ def delete(request, pk):
             error_type = 2
             return render(request, 'error_page.html', {'t': error_type})
 
-        if profile.user.username == rep.author:
+        if profile.user.username == rep.author or profile.is_admin:
             rep.delete()
             for docs in doc:
                 docs.delete()
