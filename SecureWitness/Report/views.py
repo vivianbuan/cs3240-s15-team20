@@ -20,10 +20,33 @@ import os
 from django.core.files import File
 from django.contrib.auth.models import User
 import hashlib
+from django.db.models import Q
+from accounts.models import UserProfile, UserGroup
 
 def home(request):
     entries = reports.objects.all().filter(private=False)[:20]
     return render(request, 'index.html', {'report': entries})
+
+
+def list_all_reports(request):
+    if request.user.is_active:
+        profile = UserProfile.objects.filter(user=request.user)[0]
+        if profile.is_admin:
+            entries = reports.objects.all()
+        else:
+            entries = reports.objects.filter(Q(private=False) | Q(author=profile.user.username))
+            groups = UserGroup.objects.all()
+            #    pprint(groups, sys.stderr)
+            for g in groups:
+                users = g.user_set.all()
+                if profile.user in users:
+                    for r in g.group.reports_set.all():
+                        if r not in entries:
+                            entries.append(r)
+    else:
+        profile = None
+        entries = reports.objects.all().filter(private=False)[:20]
+    return render(request, 'list_all_reports.html', {'report': entries})
 
 
 def detail(request, pk):
@@ -324,3 +347,5 @@ def search(request):
 
 
     return render_to_response('search.html')
+
+
