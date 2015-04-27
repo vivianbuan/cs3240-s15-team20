@@ -56,7 +56,7 @@ def getpage(url,username,password, page):
 			print(e.read())
 
 def listreports(url, username, password):
-	string = getpage(url,username,password,'/')
+	string = getpage(url,username,password,'/reports/list_all/')
 	parser = MainParser()
 	parser.feed(string)
 	parser.close()
