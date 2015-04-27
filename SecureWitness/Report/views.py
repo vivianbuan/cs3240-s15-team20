@@ -20,7 +20,7 @@ import os
 from django.core.files import File
 from django.contrib.auth.models import User
 import hashlib
-
+from Report.models import Comment
 def home(request):
     entries = reports.objects.all().filter(private=False)[:20]
     return render(request, 'index.html', {'report': entries})
@@ -30,7 +30,16 @@ def detail(request, pk):
     rep = reports.objects.all().filter(pk=pk)[0]
     doc = Document.objects.all().filter(report=rep)
     groups = rep.groups.all()
-    users = [] 
+    users = []
+
+    if request.method == 'POST' :
+        auth = request.POST.get("author")
+        co = request.POST.get("comment")
+        rep = reports.objects.all().filter(pk=pk)[0]
+        comment = Comment(name=auth, text=co)
+        comment.report = rep
+        comment.save()
+    comments = Comment.objects.filter(report=rep)
     for g in groups: 
         users += g.user_set.all()
     pprint(users, sys.stderr)
@@ -42,12 +51,12 @@ def detail(request, pk):
             return render(request, 'error_page.html', {'t': error_type})
 
         if profile.user in users:
-            return render(request, 'detail.html', {'report': rep, 'documents': doc, 'groups': groups})
+            return render(request, 'detail.html', {'report': rep, 'documents': doc, 'groups': groups,})
         else:
             error_type = 1
             return render(request, 'error_page.html', {'t': error_type})
     else:
-        return render(request, 'detail.html', {'report': rep, 'documents': doc, 'groups': groups})
+        return render(request, 'detail.html', {'report': rep, 'documents': doc, 'groups': groups ,'comments':comments,})
 
 
 @login_required(login_url="/accounts/login/")
@@ -167,7 +176,7 @@ def edit(request, pk):
                 for f in files: 
                     BLOCKSIZE = 65536
                     hasher = hashlib.md5() 
-                    for chunk in f.chunks(BLOCKSIZE): 
+                    for chunk in f.chunks(BLOCKSIZE):
                         #buf = chunk
                         hasher.update(chunk)
                     md5hash = hasher.hexdigest() 
@@ -304,9 +313,14 @@ def search(request):
             for pairs in query_string.split('&&'):
                 or_query = None
                 pairs = pairs.split(':')
+                if len(pairs) < 2 :
+                    error_type = 6
+                    return render(request, 'error_page.html', {'t': error_type})
                 x = pairs[0].strip()
                 y = pairs[1].strip()
+
                 entries = Q(**{"%s__icontains" % x: y})
+
                 if or_query is None:
                     or_query = entries
                 else:
@@ -322,5 +336,43 @@ def search(request):
                       {  'found_entries': found_entries, 'query': query_string },
                     )
 
-
     return render_to_response('search.html')
+
+
+
+
+
+
+
+@login_required(login_url="/accounts/login/")
+def delete_comment(request, pk):
+    if request.method == 'POST':
+        rep = reports.objects.all().filter(pk=pk)[0]
+        com = Comment.objects.all().filter(report=rep)
+
+        if request.user.is_active:
+            profile = UserProfile.objects.filter(user=request.user)[0]
+        else:
+            error_type = 2
+            return render(request, 'error_page.html', {'t': error_type})
+
+        if profile.user.username == com.name:
+            com.delete()
+
+        else:
+            error_type = 2
+            return render(request, 'error_page.html', {'t': error_type})
+    return HttpResponseRedirect(reverse('detail'))
+
+
+
+
+
+
+
+
+
+
+
+
+
